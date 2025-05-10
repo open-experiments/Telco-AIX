@@ -80,7 +80,12 @@ def load_model():
     global model, scaler, label_encoders
     try:
         model = StarlinkTransformer(input_dim=8)
-        model.load_state_dict(torch.load(os.path.join(MODELS_DIR, 'starlink_transformer.pth')))
+
+        if torch.cuda.is_available():
+            model.load_state_dict(torch.load(os.path.join(MODELS_DIR, 'starlink_transformer.pth')))
+        else:
+            model.load_state_dict(torch.load(os.path.join(MODELS_DIR, 'starlink_transformer.pth'), map_location=torch.device('cpu')))
+
         model.eval()
         
         scaler = joblib.load(os.path.join(MODELS_DIR, 'scaler.joblib'))

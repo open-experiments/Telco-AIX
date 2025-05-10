@@ -15,4 +15,6 @@ asyncio>=3.4.3
 # Utilities
 python-dateutil>=2.8.2
 
+jinja2
+
 setuptools
