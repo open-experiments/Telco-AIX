@@ -246,14 +246,6 @@ This project includes a `CLAUDE.md` file that provides specific guidance for AI 
 - Development workflow information
 - Implementation notes and best practices
 
-## For AI Assistants
-
-This project includes a `CLAUDE.md` file that provides specific guidance for AI assistants working with this codebase, including:
-- Architecture overview and key components
-- Essential commands and troubleshooting steps  
-- Development workflow information
-- Implementation notes and best practices
-
 '''
 CLAUDE.md file is not available in repo
 '''
