@@ -5,7 +5,7 @@ import asyncio
 import logging
 import uuid
 from typing import Dict, Any, List, Optional, Set
-from datetime import datetime
+from datetime import datetime, timezone
 
 from protocols.acp.schema import (
     ACPMessage, AgentDescription, MessageType, ActionType, CapabilityInfo
@@ -84,7 +84,7 @@ class OrchestrationService:
         """
         if agent_id in self.agent_registry:
             self.agent_registry[agent_id].status = status
-            self.agent_registry[agent_id].last_seen = datetime.utcnow()
+            self.agent_registry[agent_id].last_seen = datetime.now(timezone.utc)
             self.logger.debug(f"Updated status of agent {agent_id} to {status}")
             
     async def find_agents_by_type(self, agent_type: str) -> List[AgentDescription]:
@@ -137,8 +137,8 @@ class OrchestrationService:
             "parameters": parameters,
             "initiator_id": initiator_id,
             "status": "created",
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
             "steps": [],
             "results": {}
         }
@@ -170,7 +170,7 @@ class OrchestrationService:
         try:
             # Update workflow status
             workflow["status"] = "running"
-            workflow["updated_at"] = datetime.utcnow()
+            workflow["updated_at"] = datetime.now(timezone.utc)
             
             # Execute workflow based on type
             if workflow_type == "anomaly_resolution":
@@ -187,14 +187,14 @@ class OrchestrationService:
             # Update workflow status if not already failed
             if workflow["status"] != "failed":
                 workflow["status"] = "completed"
-                workflow["completed_at"] = datetime.utcnow()
+                workflow["completed_at"] = datetime.now(timezone.utc)
                 
         except Exception as e:
             self.logger.error(f"Error executing workflow {workflow_id}: {str(e)}")
             workflow["status"] = "failed"
             workflow["error"] = str(e)
         finally:
-            workflow["updated_at"] = datetime.utcnow()
+            workflow["updated_at"] = datetime.now(timezone.utc)
             
     async def _execute_anomaly_resolution_workflow(self, workflow: Dict[str, Any]) -> None:
         """Execute an anomaly resolution workflow.
@@ -214,9 +214,10 @@ class OrchestrationService:
         # (In a real implementation, this would communicate with the agents)
         workflow["steps"].append({
             "step_id": "diagnostics",
+            "description": "Performing network diagnostics and anomaly detection",
             "status": "completed",
-            "started_at": datetime.utcnow(),
-            "completed_at": datetime.utcnow(),
+            "started_at": datetime.now(timezone.utc),
+            "completed_at": datetime.now(timezone.utc),
             "agents": [agent.agent_id for agent in diagnostic_agents]
         })
         
@@ -229,9 +230,10 @@ class OrchestrationService:
         # (In a real implementation, this would communicate with the agents)
         workflow["steps"].append({
             "step_id": "planning",
+            "description": "Generating remediation plan based on diagnostic results",
             "status": "completed",
-            "started_at": datetime.utcnow(),
-            "completed_at": datetime.utcnow(),
+            "started_at": datetime.now(timezone.utc),
+            "completed_at": datetime.now(timezone.utc),
             "agents": [agent.agent_id for agent in planning_agents]
         })
         
@@ -244,9 +246,10 @@ class OrchestrationService:
         # (In a real implementation, this would communicate with the agents)
         workflow["steps"].append({
             "step_id": "execution",
+            "description": "Executing the remediation plan on network elements",
             "status": "completed",
-            "started_at": datetime.utcnow(),
-            "completed_at": datetime.utcnow(),
+            "started_at": datetime.now(timezone.utc),
+            "completed_at": datetime.now(timezone.utc),
             "agents": [agent.agent_id for agent in execution_agents]
         })
         
@@ -259,16 +262,17 @@ class OrchestrationService:
         # (In a real implementation, this would communicate with the agents)
         workflow["steps"].append({
             "step_id": "validation",
+            "description": "Validating that the network issue has been resolved",
             "status": "completed",
-            "started_at": datetime.utcnow(),
-            "completed_at": datetime.utcnow(),
+            "started_at": datetime.now(timezone.utc),
+            "completed_at": datetime.now(timezone.utc),
             "agents": [agent.agent_id for agent in validation_agents]
         })
         
         # Record results
         workflow["results"] = {
             "resolution_status": "success",
-            "resolution_time": (datetime.utcnow() - workflow["created_at"]).total_seconds(),
+            "resolution_time": (datetime.now(timezone.utc) - workflow["created_at"]).total_seconds(),
             "agents_involved": len(diagnostic_agents) + len(planning_agents) + len(execution_agents) + len(validation_agents)
         }
         
@@ -283,7 +287,7 @@ class OrchestrationService:
         workflow["results"] = {
             "optimization_status": "success",
             "optimization_gain": "15%",
-            "completion_time": datetime.utcnow().isoformat()
+            "completion_time": datetime.now(timezone.utc).isoformat()
         }
         
     async def _execute_customer_issue_workflow(self, workflow: Dict[str, Any]) -> None:
@@ -297,7 +301,7 @@ class OrchestrationService:
         workflow["results"] = {
             "resolution_status": "success",
             "customer_id": workflow["parameters"].get("customer_id"),
-            "resolution_time": (datetime.utcnow() - workflow["created_at"]).total_seconds()
+            "resolution_time": (datetime.now(timezone.utc) - workflow["created_at"]).total_seconds()
         }
         
     async def get_workflow_status(self, workflow_id: str) -> Optional[Dict[str, Any]]:
@@ -314,12 +318,24 @@ class OrchestrationService:
             
         workflow = self.workflows[workflow_id]
         
+        # Convert datetime fields in steps to ISO format
+        steps_formatted = []
+        for step in workflow["steps"]:
+            step_formatted = step.copy()
+            for time_field in ["started_at", "completed_at"]:
+                if time_field in step_formatted and step_formatted[time_field]:
+                    step_formatted[time_field] = step_formatted[time_field].isoformat()
+            steps_formatted.append(step_formatted)
+        
         return {
             "workflow_id": workflow["workflow_id"],
             "workflow_type": workflow["workflow_type"],
             "status": workflow["status"],
             "created_at": workflow["created_at"].isoformat(),
             "updated_at": workflow["updated_at"].isoformat(),
+            "initiator_id": workflow.get("initiator_id"),
+            "parameters": workflow.get("parameters", {}),
+            "steps": steps_formatted,
             "steps_completed": len([step for step in workflow["steps"] if step["status"] == "completed"]),
             "steps_total": len(workflow["steps"]),
             "results": workflow.get("results", {})
@@ -364,7 +380,7 @@ class OrchestrationService:
         
         # In a real implementation, this would send messages to the subscribers
         # For this example, we'll just log the event
-        event_data["published_at"] = datetime.utcnow().isoformat()
+        event_data["published_at"] = datetime.now(timezone.utc).isoformat()
         event_data["subscribers"] = list(subscribers)
         
         self.logger.info(f"Published {event_type} event: {event_data}")

@@ -1,0 +1,102 @@
+---
+- name: Restart SMF Service
+  hosts: localhost
+  gather_facts: no
+  vars:
+    component: "{{ component | default('smf') }}"
+    anomaly_id: "{{ anomaly_id | default('unknown') }}"
+    severity: "{{ severity | default('MEDIUM') }}"
+    namespace: "{{ namespace | default('5g-core') }}"
+  
+  tasks:
+    - name: Log restart action start
+      debug:
+        msg: |
+          =================================================
+          ANSIBLE PLAYBOOK EXECUTION STARTED
+          =================================================
+          Playbook: Restart SMF Service
+          Anomaly ID: {{ anomaly_id }}
+          Component: {{ component }}
+          Severity: {{ severity }}
+          Namespace: {{ namespace }}
+          Timestamp: {{ ansible_date_time.iso8601 }}
+          =================================================
+
+    - name: Check current SMF service status
+      debug:
+        msg: "DEMO: Checking current SMF service health status..."
+
+    - name: Create service configuration backup
+      debug:
+        msg: "DEMO: Creating backup of SMF service configuration"
+
+    - name: Drain SMF traffic gracefully
+      debug:
+        msg: "DEMO: Gracefully draining traffic from SMF instances"
+
+    - name: Stop SMF service pods (Kubernetes simulation)
+      debug:
+        msg: |
+          DEMO: Executing kubectl command:
+          kubectl delete pods -n {{ namespace }} -l app=smf --grace-period=30
+          
+          Expected behavior:
+          - Pods will terminate gracefully
+          - New pods will be created automatically
+          - Service continuity maintained
+
+    - name: Wait for pod termination
+      debug:
+        msg: "DEMO: Waiting for SMF pods to terminate cleanly (30 seconds)"
+
+    - name: Wait for new pods to start
+      debug:
+        msg: "DEMO: Waiting for new SMF pods to become ready (45 seconds)"
+
+    - name: Verify SMF service health
+      debug:
+        msg: |
+          DEMO: Health check results:
+          - SMF API endpoint: HEALTHY
+          - Database connections: ACTIVE
+          - Session state: RECOVERED
+          - Memory usage: OPTIMIZED
+
+    - name: Run SMF service diagnostics
+      debug:
+        msg: |
+          DEMO: Post-restart diagnostics:
+          - Session establishment rate: NORMAL
+          - Memory leaks: CLEARED
+          - Connection pools: REFRESHED
+          - Cache state: REBUILT
+
+    - name: Restore traffic to SMF
+      debug:
+        msg: "DEMO: Restoring full traffic to restarted SMF instances"
+
+    - name: Log restart action completion
+      debug:
+        msg: |
+          =================================================
+          ANSIBLE PLAYBOOK EXECUTION COMPLETED
+          =================================================
+          Result: SUCCESS
+          Action: SMF service restarted
+          Downtime: ~0 seconds (rolling restart)
+          Status: All instances healthy
+          Memory: Optimized and leak-free
+          Duration: ~90 seconds total
+          =================================================
+
+    - name: Create execution report
+      debug:
+        msg: |
+          Execution Summary:
+          - Anomaly {{ anomaly_id }} addressed
+          - SMF service successfully restarted
+          - Memory leaks cleared
+          - Session establishment rate restored
+          - Zero-downtime deployment achieved
+          - Continue monitoring for 10 minutes

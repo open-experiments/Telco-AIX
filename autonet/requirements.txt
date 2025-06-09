@@ -1,0 +1,42 @@
+# requirements.txt - Updated for NOC Integration System
+
+# Web server and API
+fastapi>=0.103.1
+uvicorn>=0.23.2
+aiohttp>=3.8.5
+
+# Data handling and validation
+pydantic>=2.4.2
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Asynchronous programming
+asyncio>=3.4.3
+
+# Utilities
+python-dateutil>=2.8.2
+jinja2
+setuptools
+
+# NOC Integration specific dependencies
+# Data processing and analysis
+scikit-learn>=1.3.0
+
+# Langchain for vector processing (if using vector stores)
+langchain>=0.0.300
+langchain-openai>=0.0.5
+langchain-community>=0.0.20
+
+# Vector storage and embeddings
+faiss-cpu>=1.7.4
+
+# Optional: Ansible for real playbook execution
+# ansible>=8.0.0  # Uncomment if you want to install Ansible
+
+# Optional: Additional data processing
+# openpyxl>=3.1.0  # For Excel file processing
+# PyYAML>=6.0      # For YAML configuration files
+
+# Development and testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0

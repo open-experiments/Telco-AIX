@@ -6,7 +6,7 @@ import logging
 import uuid
 from typing import Dict, Any, List, Optional, Callable, Union
 import aiohttp
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .schema import ACPMessage, ACPHeader, MessageType, ActionType, MessagePriority, CapabilityInfo
 
@@ -44,11 +44,26 @@ class ACPMessagingClient:
         for attempt in range(max_retries):
             try:
                 self.logger.info(f"Connecting to ACP broker at {self.broker_url}/ws/{self.agent_id} (attempt {attempt+1}/{max_retries})")
-                self.websocket = await self.session.ws_connect(f"{self.broker_url}/ws/{self.agent_id}")
+                # Add timeout and heartbeat parameters
+                self.websocket = await self.session.ws_connect(
+                    f"{self.broker_url}/ws/{self.agent_id}",
+                    timeout=aiohttp.ClientTimeout(total=30.0),
+                    heartbeat=30.0
+                )
                 self.is_connected = True
                 self.listening_task = asyncio.create_task(self._listen_for_messages())
                 self.logger.info(f"Connected to ACP broker at {self.broker_url}")
                 return
+            except asyncio.TimeoutError as e:
+                self.is_connected = False
+                self.logger.error(f"Failed to connect to ACP broker (attempt {attempt+1}/{max_retries}): Connection timeout to host {self.broker_url}/ws/{self.agent_id}")
+                
+                if attempt < max_retries - 1:
+                    self.logger.info(f"Retrying in {retry_delay} seconds...")
+                    await asyncio.sleep(retry_delay)
+                else:
+                    self.logger.error(f"Maximum connection attempts reached. Could not connect to broker.")
+                    raise
             except aiohttp.ClientError as e:
                 self.is_connected = False
                 self.logger.error(f"Failed to connect to ACP broker (attempt {attempt+1}/{max_retries}): {str(e)}")
@@ -182,7 +197,7 @@ class ACPMessagingClient:
             message_id=str(uuid.uuid4()),
             sender_id=self.agent_id,
             recipient_id=recipient_id,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             message_type=message_type,
             priority=priority,
             in_reply_to=in_reply_to,

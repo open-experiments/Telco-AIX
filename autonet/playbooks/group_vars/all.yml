@@ -1,0 +1,25 @@
+---
+# Global variables for all playbooks
+demo_mode: true
+environment: "development"
+monitoring_enabled: true
+notification_webhook: "http://localhost:30080/webhook"
+
+# Default resource limits
+default_cpu_limit: "2000m"
+default_memory_limit: "4Gi"
+
+# Network optimization defaults
+default_load_threshold: 80
+default_timeout: 30
+
+# Kubernetes namespace
+k8s_namespace: "5g-core"
+
+# Logging configuration
+log_level: "INFO"
+log_retention_days: 7
+
+# Health check settings
+health_check_interval: 30
+health_check_timeout: 10

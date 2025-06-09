@@ -1,0 +1,136 @@
+---
+- name: Adjust UPF Load Balancing
+  hosts: localhost
+  gather_facts: no
+  vars:
+    load_threshold: "{{ threshold | default(80) }}"
+    component: "{{ component | default('upf') }}"
+    anomaly_id: "{{ anomaly_id | default('unknown') }}"
+    severity: "{{ severity | default('MEDIUM') }}"
+    optimization_level: "{{ 'aggressive' if severity == 'CRITICAL' else 'standard' }}"
+  
+  tasks:
+    - name: Log load balancing action start
+      debug:
+        msg: |
+          =================================================
+          ANSIBLE PLAYBOOK EXECUTION STARTED
+          =================================================
+          Playbook: Adjust UPF Load Balancing
+          Anomaly ID: {{ anomaly_id }}
+          Component: {{ component }}
+          Severity: {{ severity }}
+          Load Threshold: {{ load_threshold }}%
+          Optimization: {{ optimization_level }}
+          Timestamp: {{ ansible_date_time.iso8601 }}
+          =================================================
+
+    - name: Analyze current UPF load distribution
+      debug:
+        msg: |
+          DEMO: Current load analysis:
+          - Primary UPF: 95% utilization (HIGH)
+          - Secondary UPF: 45% utilization (NORMAL)
+          - Backup UPF: 20% utilization (LOW)
+          - Latency impact: +30ms average
+
+    - name: Calculate optimal load distribution
+      debug:
+        msg: |
+          DEMO: Calculating optimal distribution:
+          - Target threshold: {{ load_threshold }}%
+          - New distribution: 70% / 65% / 40%
+          - Expected latency reduction: -25ms
+
+    - name: Backup current load balancer configuration
+      debug:
+        msg: "DEMO: Creating backup of current load balancer rules"
+
+    - name: Update UPF load balancer weights
+      debug:
+        msg: |
+          DEMO: Updating load balancer configuration:
+          
+          upstream upf_backend {
+              server upf-primary:8080 weight=3;
+              server upf-secondary:8080 weight=3;
+              server upf-backup:8080 weight=2;
+              least_conn;
+              keepalive 32;
+          }
+
+    - name: Apply traffic routing optimizations
+      debug:
+        msg: |
+          DEMO: Applying traffic routing rules:
+          - High priority traffic: Direct to least loaded UPF
+          - Normal traffic: Round-robin distribution
+          - Background traffic: Route to backup UPF
+
+    - name: Configure connection pooling
+      debug:
+        msg: |
+          DEMO: Optimizing connection pools:
+          - Max connections per UPF: 1000
+          - Connection timeout: 5s
+          - Keep-alive: 300s
+          - Health check interval: 10s
+
+    - name: Update quality of service rules
+      debug:
+        msg: |
+          DEMO: QoS configuration updated:
+          - Voice calls: Priority queue
+          - Video streaming: Guaranteed bandwidth
+          - Data transfer: Best effort
+
+    - name: Apply configuration changes
+      debug:
+        msg: "DEMO: Reloading load balancer with new configuration (graceful reload)"
+
+    - name: Wait for configuration propagation
+      debug:
+        msg: "DEMO: Waiting for configuration to propagate across all UPF instances"
+
+    - name: Verify load distribution
+      debug:
+        msg: |
+          DEMO: Post-adjustment verification:
+          - Primary UPF: 72% utilization (OPTIMAL)
+          - Secondary UPF: 68% utilization (OPTIMAL)  
+          - Backup UPF: 42% utilization (OPTIMAL)
+          - Average latency: 38ms (-27ms improvement)
+
+    - name: Run performance tests
+      debug:
+        msg: |
+          DEMO: Performance test results:
+          - Throughput: 1.2 Gbps (+200 Mbps)
+          - Packet loss: 0.001% (-0.004%)
+          - Jitter: 2ms (-6ms)
+          - Connection success rate: 99.98%
+
+    - name: Log load balancing completion
+      debug:
+        msg: |
+          =================================================
+          ANSIBLE PLAYBOOK EXECUTION COMPLETED
+          =================================================
+          Result: SUCCESS
+          Action: UPF load balancing optimized
+          Latency improvement: -27ms
+          Throughput increase: +200 Mbps
+          Load distribution: BALANCED
+          Duration: ~60 seconds
+          =================================================
+
+    - name: Create execution report
+      debug:
+        msg: |
+          Execution Summary:
+          - Anomaly {{ anomaly_id }} addressed
+          - UPF load balancing optimized
+          - Latency reduced by 27ms
+          - Throughput increased by 200 Mbps
+          - All UPF instances within optimal range
+          - Monitor for 20 minutes to ensure stability

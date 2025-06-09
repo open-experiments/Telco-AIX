@@ -4,7 +4,7 @@
 import aiohttp
 import logging
 from typing import Dict, Any, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .schema import MCPContext, MCPHeader, DomainMetadata, ContextType, ConfidenceLevel
 
@@ -71,7 +71,7 @@ class MCPClient:
         """
         header = MCPHeader(
             source_id=self.client_id,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             priority=priority,
             correlation_id=correlation_id
         )

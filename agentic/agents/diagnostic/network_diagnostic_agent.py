@@ -6,7 +6,7 @@ import logging
 import time
 from typing import Dict, Any, List, Optional, Tuple
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from agent.base import DiagnosticAgent
 from protocols.mcp.client import MCPClient
@@ -39,7 +39,7 @@ class NetworkMetric:
             timestamp: Timestamp for the value (default: current time)
         """
         if timestamp is None:
-            timestamp = datetime.utcnow()
+            timestamp = datetime.now(timezone.utc)
             
         self.values.append(value)
         self.timestamps.append(timestamp)
@@ -91,11 +91,11 @@ class NetworkMetric:
         return {
             "name": self.name,
             "count": len(self.values),
-            "current": self.values[-1],
-            "mean": np.mean(self.values),
-            "std": np.std(self.values),
-            "min": np.min(self.values),
-            "max": np.max(self.values),
+            "current": float(self.values[-1]),
+            "mean": float(np.mean(self.values)),
+            "std": float(np.std(self.values)),
+            "min": float(np.min(self.values)),
+            "max": float(np.max(self.values)),
             "timestamp": self.timestamps[-1].isoformat()
         }
 
@@ -103,9 +103,9 @@ class NetworkDiagnosticAgent(DiagnosticAgent):
     """Agent for diagnosing network issues based on telemetry data."""
     
     def __init__(self, agent_id: Optional[str] = None, name: str = None, 
-                 telemetry_url: str = "http://localhost:8001/telemetry",
-                 mcp_url: str = "http://localhost:8000",
-                 acp_broker_url: str = "http://localhost:8002",
+                 telemetry_url: str = "http://127.0.0.1:8001/telemetry",
+                 mcp_url: str = "http://127.0.0.1:8000",
+                 acp_broker_url: str = "ws://127.0.0.1:8002",
                  metrics_config: Optional[Dict[str, Dict[str, Any]]] = None,
                  poll_interval: float = 60.0,
                  config: Dict[str, Any] = None):
@@ -132,6 +132,7 @@ class NetworkDiagnosticAgent(DiagnosticAgent):
         self.mcp_url = mcp_url
         self.acp_broker_url = acp_broker_url
         self.poll_interval = poll_interval
+        
         
         # Set up metrics to monitor
         self.metrics: Dict[str, NetworkMetric] = {}
@@ -241,7 +242,7 @@ class NetworkDiagnosticAgent(DiagnosticAgent):
         """
         # In a real implementation, this would make an API call to get telemetry data
         # For this example, we'll generate some simulated telemetry data
-        timestamp = datetime.utcnow()
+        timestamp = datetime.now(timezone.utc)
         
         # Generate baseline values
         base_values = {
@@ -356,7 +357,7 @@ class NetworkDiagnosticAgent(DiagnosticAgent):
             payload={
                 "anomalies": anomalies,
                 "severity": "medium",
-                "detection_time": datetime.utcnow().isoformat()
+                "detection_time": datetime.now(timezone.utc).isoformat()
             },
             priority=MessagePriority.HIGH,
             context_refs=[context_id]
@@ -407,7 +408,7 @@ class NetworkDiagnosticAgent(DiagnosticAgent):
             "metrics_statistics": {
                 name: metric.get_statistics() for name, metric in self.metrics.items()
             },
-            "diagnostic_time": datetime.utcnow().isoformat(),
+            "diagnostic_time": datetime.now(timezone.utc).isoformat(),
             "diagnostic_agent": self.agent_id
         }
         
@@ -435,7 +436,7 @@ class NetworkDiagnosticAgent(DiagnosticAgent):
         # For now, we'll just return a simple acknowledgement
         return {
             "status": "acknowledged",
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
         
     def get_capabilities(self) -> List[str]:

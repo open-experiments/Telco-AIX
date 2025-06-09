@@ -5,7 +5,7 @@ import asyncio
 import logging
 import uuid
 from typing import Dict, Any, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from agent.base import ValidationAgent
 from protocols.mcp.client import MCPClient
@@ -17,9 +17,9 @@ class NetworkValidationAgent(ValidationAgent):
     """Agent for validating network changes and resolution of issues."""
     
     def __init__(self, agent_id: Optional[str] = None, name: str = None,
-                 mcp_url: str = "http://localhost:8000",
-                 acp_broker_url: str = "http://localhost:8002",
-                 telemetry_url: str = "http://localhost:8001/telemetry",
+                 mcp_url: str = "http://127.0.0.1:8000",
+                 acp_broker_url: str = "ws://127.0.0.1:8002",
+                 telemetry_url: str = "http://127.0.0.1:8001/telemetry",
                  config: Dict[str, Any] = None):
         """Initialize a new network validation agent.
         
@@ -237,7 +237,7 @@ class NetworkValidationAgent(ValidationAgent):
             payload={
                 "validation_result": result,
                 "agent_id": self.agent_id,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             },
             priority=3,
             confidence=ConfidenceLevel.HIGH,
@@ -301,7 +301,7 @@ class NetworkValidationAgent(ValidationAgent):
         }
         
         # Add timestamp and metadata
-        telemetry["timestamp"] = datetime.utcnow().isoformat()
+        telemetry["timestamp"] = datetime.now(timezone.utc).isoformat()
         telemetry["cell_id"] = scope
         telemetry["region"] = scope.split("_")[0] if "_" in scope else "UNKNOWN"
         
@@ -331,7 +331,7 @@ class NetworkValidationAgent(ValidationAgent):
         result = {
             "plan_id": plan_id,
             "validation_status": "in_progress",
-            "validation_time": datetime.utcnow().isoformat(),
+            "validation_time": datetime.now(timezone.utc).isoformat(),
             "executed_by": execution_result.get("executed_by", "unknown"),
             "validated_by": self.agent_id,
             "scope": scope,
@@ -523,7 +523,7 @@ class NetworkValidationAgent(ValidationAgent):
         # Default response for other message types
         return {
             "status": "acknowledged",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "validation_agent": self.agent_id
         }
         

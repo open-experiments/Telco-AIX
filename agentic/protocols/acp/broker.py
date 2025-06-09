@@ -45,7 +45,14 @@ class ACPMessageBroker:
             self.logger.info(f"WebSocket connection request from agent {agent_id}")
             await self._handle_connection(websocket, agent_id)
             
+        @self.app.get("/health")
+        @self.app.head("/health")
+        async def health_check():
+            """Health check endpoint."""
+            return {"status": "healthy", "service": "acp-broker"}
+            
         @self.app.get("/agents")
+        @self.app.head("/agents")
         async def get_agents():
             """Get a list of connected agents."""
             return {

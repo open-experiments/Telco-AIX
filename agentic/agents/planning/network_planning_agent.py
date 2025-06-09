@@ -5,7 +5,7 @@ import asyncio
 import logging
 import uuid
 from typing import Dict, Any, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from agent.base import PlanningAgent
 from protocols.mcp.client import MCPClient
@@ -17,8 +17,8 @@ class NetworkPlanningAgent(PlanningAgent):
     """Agent for generating plans to resolve network issues."""
     
     def __init__(self, agent_id: Optional[str] = None, name: str = None,
-                 mcp_url: str = "http://localhost:8000",
-                 acp_broker_url: str = "http://localhost:8002",
+                 mcp_url: str = "http://127.0.0.1:8000",
+                 acp_broker_url: str = "ws://127.0.0.1:8002",
                  config: Dict[str, Any] = None):
         """Initialize a new network planning agent.
         
@@ -210,7 +210,7 @@ class NetworkPlanningAgent(PlanningAgent):
             payload={
                 "plan_summary": plan.get("summary", "Network issue resolution plan"),
                 "priority": plan.get("priority", "medium"),
-                "generation_time": datetime.utcnow().isoformat()
+                "generation_time": datetime.now(timezone.utc).isoformat()
             },
             priority=MessagePriority.HIGH,
             context_refs=[plan_context_id]
@@ -235,7 +235,7 @@ class NetworkPlanningAgent(PlanningAgent):
         if not anomalies:
             return {
                 "error": "No anomalies provided to generate a plan",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "planning_agent": self.agent_id
             }
         
@@ -245,7 +245,7 @@ class NetworkPlanningAgent(PlanningAgent):
             "summary": f"Plan to resolve {len(anomalies)} network anomalies",
             "severity": severity,
             "priority": self._calculate_priority(anomalies, severity),
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
             "created_by": self.agent_id,
             "steps": [],
             "estimated_duration": 0,  # Will be calculated based on steps
@@ -494,7 +494,7 @@ class NetworkPlanningAgent(PlanningAgent):
         # Default response for other message types
         return {
             "status": "acknowledged",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "planning_agent": self.agent_id
         }
         

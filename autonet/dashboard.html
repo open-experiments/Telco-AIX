@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enhanced Autonomous 5G NOC - Real-time Agent Topology</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+            padding: 15px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: sweep 3s infinite;
+        }
+        
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        /* Enhanced Time Bar */
+        .time-bar-container {
+            background: #1f2937;
+            padding: 15px 30px;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .time-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .time-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981, #f59e0b);
+            border-radius: 6px;
+            transition: width 1s ease;
+            position: relative;
+        }
+        
+        .time-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: scan 3s infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .time-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            font-size: 0.9em;
+            color: #9ca3af;
+        }
+        
+        .time-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+        }
+        
+        .nav-tabs {
+            background: #1f2937;
+            padding: 0 30px;
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid #374151;
+        }
+        
+        .nav-tab {
+            padding: 15px 25px;
+            background: transparent;
+            color: #9ca3af;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .nav-tab:hover {
+            color: #ffffff;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .nav-tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .container {
+            padding: 30px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: linear-gradient(145deg, #1f2937 0%, #111827 100%);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid #374151;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #10b981, #f59e0b, #ef4444);
+            opacity: 0.7;
+        }
+        
+        .card h3 {
+            color: #f3f4f6;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+        
+        /* Real-time Metrics Chart Styles */
+        .metrics-chart-container {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .anomaly-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ef4444;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+        }
+        
+        .anomaly-marker::after {
+            content: '★';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+        }
+        
+        /* Enhanced Workflow Styles */
+        .workflow-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .workflow-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s ease;
+        }
+        
+        .workflow-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateX(5px);
+        }
+        
+        .workflow-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .workflow-id {
+            font-weight: 600;
+            color: #3b82f6;
+            font-size: 1.1em;
+        }
+        
+        .workflow-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        .status-completed { background: #10b981; color: white; }
+        .status-executing { background: #f59e0b; color: white; }
+        .status-failed { background: #ef4444; color: white; }
+        .status-queued { background: #6b7280; color: white; }
+        .status-diagnostic { background: #3b82f6; color: white; }
+        .status-planning { background: #8b5cf6; color: white; }
+        .status-validating { background: #06b6d4; color: white; }
+        
+        .workflow-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .workflow-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .workflow-detail-label {
+            color: #9ca3af;
+            font-size: 0.8em;
+            margin-bottom: 5px;
+        }
+        
+        .workflow-detail-value {
+            color: #f3f4f6;
+            font-weight: 500;
+        }
+        
+        /* NEW: Enhanced playbook display */
+        .playbook-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .playbook-name {
+            color: #3b82f6;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .playbook-description {
+            color: #d1d5db;
+            font-size: 0.8em;
+            margin-top: 3px;
+        }
+        
+        .workflow-steps {
+            margin-top: 15px;
+        }
+        
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .workflow-step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .step-pending { background: #6b7280; color: white; }
+        .step-active { background: #3b82f6; color: white; animation: pulse 2s infinite; }
+        .step-completed { background: #10b981; color: white; }
+        .step-failed { background: #ef4444; color: white; }
+        
+        .step-details {
+            flex: 1;
+        }
+        
+        .step-agent {
+            font-weight: 600;
+            color: #3b82f6;
+            margin-right: 10px;
+        }
+        
+        .step-description {
+            color: #f3f4f6;
+        }
+        
+        .step-timing {
+            color: #9ca3af;
+            font-size: 0.8em;
+            margin-top: 3px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .pagination-button {
+            padding: 8px 16px;
+            background: #374151;
+            color: #f3f4f6;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-button:hover:not(:disabled) {
+            background: #3b82f6;
+        }
+        
+        .pagination-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-button.active {
+            background: #3b82f6;
+        }
+        
+        .pagination-info {
+            color: #9ca3af;
+            font-size: 0.9em;
+        }
+        
+        /* Status indicators and animations */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-active { background: #10b981; }
+        .status-warning { background: #f59e0b; }
+        .status-error { background: #ef4444; }
+        .status-processing { background: #3b82f6; }
+        .status-idle { background: #6b7280; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .metric-large {
+            font-size: 3em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 10px 0;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+        
+        .metric-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .autonomous-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Speed Control Styles */
+        .speed-button {
+            padding: 8px 16px;
+            background: #374151;
+            color: #f3f4f6;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        
+        .speed-button:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+        
+        .speed-button.active {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .speed-button.active:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+        }
+        
+        /* Enhanced Agent Topology Styles */
+        .enhanced-agent-topology {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .enhanced-agent-node {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.8em;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+        
+        .enhanced-agent-node:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+            z-index: 10;
+        }
+        
+        .enhanced-agent-node.critical {
+            border-color: #ef4444;
+            animation: critical-pulse 2s infinite;
+        }
+        
+        .enhanced-agent-node.warning {
+            border-color: #f59e0b;
+            animation: warning-pulse 3s infinite;
+        }
+        
+        @keyframes critical-pulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+            50% { box-shadow: 0 8px 30px rgba(239, 68, 68, 0.7); }
+        }
+        
+        @keyframes warning-pulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 8px 30px rgba(245, 158, 11, 0.6); }
+        }
+        
+        .agent-metrics-overlay {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.7em;
+            min-width: 80px;
+            text-align: center;
+            z-index: 5;
+        }
+        
+        .data-flow-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: data-flow 2s linear infinite;
+            box-shadow: 0 0 10px #3b82f6;
+        }
+        
+        @keyframes data-flow {
+            0% { opacity: 0; transform: scale(0.5); }
+            10% { opacity: 1; transform: scale(1); }
+            90% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+        
+        .agent-details-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            background: linear-gradient(145deg, #1f2937 0%, #111827 100%);
+            border: 1px solid #374151;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 100;
+            animation: panel-slide-in 0.3s ease;
+        }
+        
+        @keyframes panel-slide-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #374151;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .panel-content {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .performance-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .performance-value {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+        
+        .performance-bar {
+            width: 100px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-left: 10px;
+        }
+        
+        .performance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #3b82f6, #f59e0b, #ef4444);
+            transition: width 0.3s ease;
+        }
+        
+        .agent-performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .agent-performance-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .agent-performance-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-2px);
+        }
+        
+        .communication-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+        
+        .decision-entry {
+            padding: 10px 12px;
+            margin: 8px 0;
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+        
+        .bottleneck-card {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .bottleneck-card.critical {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        
+        .risk-score {
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+        
+        .risk-low { color: #10b981; }
+        .risk-medium { color: #f59e0b; }
+        .risk-high { color: #ef4444; }
+        
+        .chart-container {
+            position: relative;
+            height: 200px;
+            margin: 20px 0;
+        }
+        
+        .health-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .health-metric {
+            text-align: center;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .activity-agent {
+            font-weight: 600;
+            color: #3b82f6;
+            margin-right: 15px;
+            min-width: 80px;
+        }
+        
+        .activity-message {
+            color: #f3f4f6;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="autonomous-indicator">
+        <span class="status-indicator status-active"></span>
+        AUTONOMOUS MODE ACTIVE
+    </div>
+
+    <div class="header">
+        <h1>🚀 Enhanced Autonomous 5G NOC - Real-time Agent Topology</h1>
+        <p>AI-Driven Network Intelligence with Advanced Agent Analytics</p>
+    </div>
+    
+    <!-- Enhanced Time Bar -->
+    <div class="time-bar-container">
+        <div class="time-bar">
+            <div class="time-progress" id="time-progress" style="width: 0%"></div>
+        </div>
+        <div class="time-info">
+            <div class="time-info-item">
+                <span>Timeline Progress:</span>
+                <span id="timeline-progress">0%</span>
+            </div>
+            <div class="time-info-item">
+                <span>Anomalies Discovered:</span>
+                <span id="anomaly-progress">0 / 0</span>
+            </div>
+            <div class="time-info-item">
+                <span>Processing Time:</span>
+                <span id="time-elapsed">00:00:00</span>
+            </div>
+            <div class="time-info-item">
+                <span>ETA:</span>
+                <span id="eta-time">--:--:--</span>
+            </div>
+        </div>
+        
+        <!-- Speed Controls -->
+        <div style="margin-top: 15px; display: flex; justify-content: center; align-items: center; gap: 15px;">
+            <span style="color: #9ca3af; font-weight: 600;">Processing Speed:</span>
+            <button class="speed-button active" data-speed="1" onclick="setProcessingSpeed(1)">1x</button>
+            <button class="speed-button" data-speed="5" onclick="setProcessingSpeed(5)">5x</button>
+            <button class="speed-button" data-speed="10" onclick="setProcessingSpeed(10)">10x</button>
+            <button class="speed-button" data-speed="100" onclick="setProcessingSpeed(100)">100x</button>
+            <span id="speed-status" style="color: #10b981; font-weight: 600;">Normal Speed</span>
+        </div>
+    </div>
+    
+    <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('overview')">System Overview</button>
+        <button class="nav-tab" onclick="showTab('agents')">Agent Topology</button>
+        <button class="nav-tab" onclick="showTab('workflows')">Active Workflows</button>
+    </nav>
+
+    <div class="container">
+        <!-- System Overview Tab -->
+        <div id="overview-tab" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>🎯 Anomaly Detection</h3>
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <div class="metric-value" id="amf-count">0</div>
+                            <div class="metric-label">AMF Anomalies</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="smf-count">0</div>
+                            <div class="metric-label">SMF Anomalies</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="upf-count">0</div>
+                            <div class="metric-label">UPF Anomalies</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>⚡ Autonomous Operations</h3>
+                    <div class="metric-grid">
+                        <div class="metric-item">
+                            <div class="metric-value" id="processed-count">0</div>
+                            <div class="metric-label">Processed</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="executed-count">0</div>
+                            <div class="metric-label">Executed</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="success-rate">100</div>
+                            <div class="metric-label">Success %</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>🤖 Agent Control</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                        <button class="button" onclick="triggerEvent('AMF', 'HIGH')">
+                            <span class="status-indicator status-active"></span>
+                            Trigger AMF Event
+                        </button>
+                        <button class="button" onclick="triggerEvent('SMF', 'MEDIUM')" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                            <span class="status-indicator status-warning"></span>
+                            Trigger SMF Event
+                        </button>
+                        <button class="button" onclick="triggerEvent('UPF', 'CRITICAL')" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                            <span class="status-indicator status-error"></span>
+                            Trigger UPF Event
+                        </button>
+                    </div>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <div class="status-indicator status-active"></div>
+                        <span style="color: #10b981; font-weight: 600;">System Operating Autonomously</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Real-time Metrics Charts Section -->
+            <div class="metrics-chart-container">
+                <div class="dashboard-grid">
+                    <!-- AMF Metrics Chart -->
+                    <div class="card">
+                        <h3>📊 AMF Metrics</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="amfMetricsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- SMF Metrics Chart -->
+                    <div class="card">
+                        <h3>📊 SMF Metrics</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="smfMetricsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- UPF Metrics Chart -->
+                    <div class="card">
+                        <h3>📊 UPF Metrics</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="upfMetricsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Agent Topology Tab -->
+        <div id="agents-tab" class="tab-content">
+            <!-- Real-time Topology Overview -->
+            <div class="card">
+                <h3>🤖 Real-time Agent Topology & Performance Analytics</h3>
+                
+                <!-- Topology Health Dashboard -->
+                <div class="topology-health-bar" style="margin-bottom: 20px;">
+                    <div class="health-metrics">
+                        <div class="health-metric">
+                            <div class="metric-value" id="topology-health">100%</div>
+                            <div class="metric-label">Topology Health</div>
+                        </div>
+                        <div class="health-metric">
+                            <div class="metric-value" id="total-throughput">0</div>
+                            <div class="metric-label">Total Throughput/min</div>
+                        </div>
+                        <div class="health-metric">
+                            <div class="metric-value" id="network-latency">0ms</div>
+                            <div class="metric-label">Avg Network Latency</div>
+                        </div>
+                        <div class="health-metric">
+                            <div class="metric-value" id="message-success-rate">100%</div>
+                            <div class="metric-label">Message Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Interactive Topology Visualization -->
+                <div class="enhanced-agent-topology" id="enhanced-agent-topology" style="height: 500px; position: relative; background: #111827; border-radius: 8px; padding: 20px;">
+                    <!-- Agents will be positioned by JavaScript with enhanced interactions -->
+                    
+                    <!-- Floating Agent Details Panel -->
+                    <div id="agent-details-panel" class="agent-details-panel" style="display: none;">
+                        <div class="panel-header">
+                            <h4 id="panel-agent-name">Agent Details</h4>
+                            <button onclick="closeAgentPanel()" style="background: none; border: none; color: #fff; font-size: 1.2em;">×</button>
+                        </div>
+                        <div class="panel-content" id="panel-content">
+                            <!-- Dynamic content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Analytics Grid -->
+            <div class="dashboard-grid" style="margin-top: 30px;">
+                <!-- Agent Performance Metrics -->
+                <div class="card">
+                    <h3>📊 Agent Performance Metrics</h3>
+                    <div class="agent-performance-grid" id="agent-performance-grid">
+                        <!-- Performance cards will be generated by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Network Communication Analytics -->
+                <div class="card">
+                    <h3>📡 Network Communication Analytics</h3>
+                    <div class="communication-stats" id="communication-stats">
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="networkChart"></canvas>
+                        </div>
+                        <div class="communication-log" id="communication-log" style="max-height: 200px; overflow-y: auto; margin-top: 15px;">
+                            <!-- Communication log entries -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Decision Analytics -->
+                <div class="card">
+                    <h3>🧠 AI Decision Analytics</h3>
+                    <div class="decision-analytics" id="decision-analytics">
+                        <div class="decision-metrics" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 15px;">
+                            <div class="metric-item">
+                                <div class="metric-value" id="decisions-count">0</div>
+                                <div class="metric-label">Decisions Made</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-value" id="avg-confidence">0%</div>
+                                <div class="metric-label">Avg Confidence</div>
+                            </div>
+                        </div>
+                        <div class="decision-log" id="decision-log" style="max-height: 180px; overflow-y: auto;">
+                            <!-- Decision log entries -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottleneck Prediction & Alerts -->
+                <div class="card">
+                    <h3>⚠️ Bottleneck Predictions & Alerts</h3>
+                    <div class="bottleneck-predictions" id="bottleneck-predictions">
+                        <!-- Prediction cards will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Workflows Tab -->
+        <div id="workflows-tab" class="tab-content">
+            <div class="card">
+                <h3>🔄 Active & Historical Workflows</h3>
+                
+                <!-- Workflow Summary Stats -->
+                <div class="metric-grid" style="margin-bottom: 20px;">
+                    <div class="metric-item">
+                        <div class="metric-value" id="active-workflows-count">0</div>
+                        <div class="metric-label">Active</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="completed-workflows-count">0</div>
+                        <div class="metric-label">Completed</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" id="total-workflows-count">0</div>
+                        <div class="metric-label">Total</div>
+                    </div>
+                </div>
+                
+                <!-- Workflows List -->
+                <div class="workflow-container" id="workflows-container">
+                    <div style="text-align: center; color: #9ca3af; padding: 40px;">
+                        Loading workflows...
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination" id="workflows-pagination">
+                    <!-- Pagination will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

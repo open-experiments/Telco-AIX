@@ -1,0 +1,187 @@
+---
+- name: Optimize Network Resources
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    component: "{{ component | default('all') }}"
+    anomaly_id: "{{ anomaly_id | default('unknown') }}"
+    severity: "{{ severity | default('MEDIUM') }}"
+    optimization_scope: "{{ 'full' if severity == 'CRITICAL' else 'targeted' }}"
+  
+  tasks:
+    - name: Log optimization action start
+      debug:
+        msg: |
+          =================================================
+          ANSIBLE PLAYBOOK EXECUTION STARTED
+          =================================================
+          Playbook: Optimize Network Resources
+          Anomaly ID: {{ anomaly_id }}
+          Component: {{ component }}
+          Severity: {{ severity }}
+          Scope: {{ optimization_scope }}
+          Target: All 5G Core components
+          Timestamp: {{ ansible_date_time.iso8601 }}
+          =================================================
+
+    - name: Perform system health assessment
+      debug:
+        msg: |
+          DEMO: System health assessment:
+          - CPU utilization: 78% (HIGH)
+          - Memory usage: 85% (HIGH)
+          - Network I/O: 92% (CRITICAL)
+          - Disk I/O: 45% (NORMAL)
+          - Cache hit ratio: 67% (SUBOPTIMAL)
+
+    - name: Clear system caches
+      debug:
+        msg: |
+          DEMO: Executing cache optimization:
+          echo 3 > /proc/sys/vm/drop_caches
+          
+          Cache statistics:
+          - Page cache freed: 2.1 GB
+          - Buffer cache freed: 512 MB
+          - Inode cache freed: 256 MB
+          - Total memory reclaimed: 2.9 GB
+
+    - name: Optimize network buffer sizes
+      debug:
+        msg: |
+          DEMO: Updating network buffer configurations:
+          
+          /etc/sysctl.conf updates:
+          net.core.rmem_max = 268435456          # 256MB receive buffer
+          net.core.wmem_max = 268435456          # 256MB send buffer  
+          net.ipv4.tcp_rmem = 4096 87380 268435456
+          net.ipv4.tcp_wmem = 4096 65536 268435456
+          net.core.netdev_max_backlog = 30000
+          net.ipv4.tcp_congestion_control = bbr
+
+    - name: Optimize database connections
+      debug:
+        msg: |
+          DEMO: Database optimization:
+          - Connection pool size: Increased to 200
+          - Query cache: Cleared and optimized
+          - Index analysis: Completed
+          - Slow queries: Identified and optimized
+
+    - name: Clean up temporary files
+      debug:
+        msg: |
+          DEMO: Cleanup operations:
+          - Temporary files removed: 1.2 GB
+          - Log rotation applied: 800 MB freed
+          - Core dumps cleaned: 2.1 GB
+          - Old container images: 5.2 GB
+
+    - name: Optimize container resource limits
+      debug:
+        msg: |
+          DEMO: Container resource optimization:
+          
+          AMF containers:
+          - CPU limit: 2000m → 2500m
+          - Memory limit: 4Gi → 5Gi
+          
+          SMF containers:
+          - CPU limit: 1500m → 2000m
+          - Memory limit: 3Gi → 4Gi
+          
+          UPF containers:
+          - CPU limit: 3000m → 3500m
+          - Memory limit: 6Gi → 7Gi
+
+    - name: Apply CPU governor optimizations
+      debug:
+        msg: |
+          DEMO: CPU performance optimization:
+          - Governor: ondemand → performance
+          - CPU frequency scaling: Disabled
+          - Turbo boost: Enabled
+          - CPU affinity: Optimized for network workloads
+
+    - name: Optimize network interface parameters
+      debug:
+        msg: |
+          DEMO: Network interface optimization:
+          - Ring buffer size: Increased
+          - Interrupt coalescing: Optimized
+          - RSS (Receive Side Scaling): Enabled
+          - GRO (Generic Receive Offload): Enabled
+
+    - name: Update monitoring thresholds
+      debug:
+        msg: |
+          DEMO: Monitoring threshold updates:
+          - CPU alert threshold: 80% → 85%
+          - Memory alert threshold: 85% → 90%
+          - Network utilization: 90% → 95%
+          - Response time SLA: Adjusted for new baseline
+
+    - name: Restart affected services with optimization
+      debug:
+        msg: |
+          DEMO: Service restart sequence:
+          1. AMF services: Rolling restart (0 downtime)
+          2. SMF services: Rolling restart (0 downtime)  
+          3. UPF services: Blue-green deployment
+          4. Load balancers: Configuration reload
+
+    - name: Verify system performance
+      debug:
+        msg: |
+          DEMO: Post-optimization verification:
+          - CPU utilization: 78% → 62% (-16%)
+          - Memory usage: 85% → 68% (-17%)
+          - Network I/O: 92% → 74% (-18%)
+          - Response time: 45ms → 32ms (-29%)
+          - Throughput: +35% improvement
+
+    - name: Run comprehensive health check
+      debug:
+        msg: |
+          DEMO: System health check results:
+          ✅ All 5G core services: HEALTHY
+          ✅ Database connectivity: OPTIMAL
+          ✅ Network performance: IMPROVED
+          ✅ Resource utilization: BALANCED
+          ✅ SLA compliance: 99.9%
+
+    - name: Log optimization completion
+      debug:
+        msg: |
+          =================================================
+          ANSIBLE PLAYBOOK EXECUTION COMPLETED
+          =================================================
+          Result: SUCCESS
+          Action: Comprehensive resource optimization
+          Performance improvement: +35%
+          Memory freed: 2.9 GB
+          Response time: -29%
+          Status: All systems optimal
+          Duration: ~120 seconds
+          =================================================
+
+    - name: Create execution report
+      debug:
+        msg: |
+          Execution Summary:
+          - Anomaly {{ anomaly_id }} addressed
+          - System-wide optimization completed
+          - Performance improved by 35%
+          - Memory usage reduced by 17%
+          - Network efficiency increased by 18%
+          - All SLA targets met
+          - Extended monitoring for 30 minutes recommended
+          
+          Optimization Actions Taken:
+          1. System cache clearing
+          2. Network buffer optimization  
+          3. Database connection tuning
+          4. Container resource scaling
+          5. CPU performance optimization
+          6. Network interface tuning
+          7. Service restart with zero downtime

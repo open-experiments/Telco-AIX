@@ -4,7 +4,7 @@ import asyncio
 import logging
 import argparse
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 
 from protocols.mcp.server import MCPServer
@@ -64,29 +64,40 @@ async def setup_services(mcp_host="0.0.0.0", mcp_port=8000,
     acp_task = asyncio.create_task(acp_broker.start())
     logger.info(f"ACP broker starting on {acp_host}:{acp_port}")
     
-    # Wait for servers to initialize - give them more time
+    # Wait for servers to initialize and verify they're ready
     logger.info("Waiting for services to initialize...")
-    await asyncio.sleep(5)  # Increased to 5 seconds
+    await asyncio.sleep(3)  # Initial wait
     
-    # Check if WebSocket endpoint is ready by making a test request
-    try:
-        import aiohttp
-        async with aiohttp.ClientSession() as session:
-            # Test the API endpoint with a HEAD request
-            async with session.head(f"http://{acp_host}:{acp_port}/agents") as response:
-                if response.status == 200:
-                    logger.info("ACP broker API is ready")
-                else:
-                    logger.warning(f"ACP broker API check returned status {response.status}")
-    except Exception as e:
-        logger.warning(f"Could not verify ACP broker readiness: {str(e)}")
+    # Check if services are ready with retries
+    import aiohttp
+    max_retries = 10
+    retry_delay = 1.0
+    
+    for attempt in range(max_retries):
+        try:
+            async with aiohttp.ClientSession() as session:
+                # Test the ACP broker health endpoint
+                async with session.get(f"http://{acp_host}:{acp_port}/health", timeout=aiohttp.ClientTimeout(total=5.0)) as response:
+                    if response.status == 200:
+                        logger.info("ACP broker is ready")
+                        # Give the WebSocket server a moment to fully initialize
+                        await asyncio.sleep(2)
+                        break
+                    else:
+                        logger.warning(f"ACP broker health check returned status {response.status}")
+        except Exception as e:
+            logger.warning(f"ACP broker not ready yet (attempt {attempt+1}/{max_retries}): {str(e)}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(retry_delay)
+            else:
+                logger.error("ACP broker failed to become ready")
     
     # Start dashboard server
     dashboard_server = DashboardServer(
         host=dashboard_host,
         port=dashboard_port,
-        mcp_url=f"http://localhost:{mcp_port}",
-        acp_url=f"http://localhost:{acp_port}",
+        mcp_url=f"http://127.0.0.1:{mcp_port}",
+        acp_url=f"http://127.0.0.1:{acp_port}",
         orchestration_service=orchestration
     )
     dashboard_task = asyncio.create_task(dashboard_server.start())
@@ -97,7 +108,7 @@ async def setup_services(mcp_host="0.0.0.0", mcp_port=8000,
     
     return mcp_server, acp_broker, orchestration, dashboard_server, mcp_task, acp_task, dashboard_task
 
-async def setup_agents(mcp_url="http://localhost:8000", acp_broker_url="ws://localhost:8002"):
+async def setup_agents(mcp_url="http://127.0.0.1:8000", acp_broker_url="ws://127.0.0.1:8002"):
     """Set up all agent types."""
     agents = []
     
@@ -109,7 +120,7 @@ async def setup_agents(mcp_url="http://localhost:8000", acp_broker_url="ws://loc
         try:
             diagnostic_agent = NetworkDiagnosticAgent(
                 name="Primary Network Diagnostic Agent",
-                telemetry_url="http://localhost:8001/telemetry",
+                telemetry_url="http://127.0.0.1:8001/telemetry",
                 mcp_url=mcp_url,
                 acp_broker_url=acp_broker_url,
                 poll_interval=10.0  # For demonstration, poll every 10 seconds
@@ -143,7 +154,7 @@ async def setup_agents(mcp_url="http://localhost:8000", acp_broker_url="ws://loc
                 name="Primary Network Execution Agent",
                 mcp_url=mcp_url,
                 acp_broker_url=acp_broker_url,
-                network_api_url="http://localhost:8003/api/network"
+                network_api_url="http://127.0.0.1:8003/api/network"
             )
             await execution_agent.initialize()
             await execution_agent.start()
@@ -159,7 +170,7 @@ async def setup_agents(mcp_url="http://localhost:8000", acp_broker_url="ws://loc
                 name="Primary Network Validation Agent",
                 mcp_url=mcp_url,
                 acp_broker_url=acp_broker_url,
-                telemetry_url="http://localhost:8001/telemetry"
+                telemetry_url="http://127.0.0.1:8001/telemetry"
             )
             await validation_agent.initialize()
             await validation_agent.start()
@@ -226,7 +237,7 @@ async def register_with_orchestration(agents, orchestration):
                     "port": 8080
                 },
                 status="active",
-                last_seen=datetime.utcnow()
+                last_seen=datetime.now(timezone.utc)
             )
             
             # Register with orchestration service
@@ -269,7 +280,7 @@ async def run_network_anomaly_test(agents, dashboard_server):
             "value": 0.05,  # 5% packet loss
             "z_score": 4.2,
             "description": "Anomalous high packet loss detected",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "cell_id": "SITE_123",
             "region": "REGION_A"
         }
@@ -280,7 +291,7 @@ async def run_network_anomaly_test(agents, dashboard_server):
             "throughput": 850.0,
             "jitter": 8.0,
             "signal_strength": -75.0,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "cell_id": "SITE_123",
             "region": "REGION_A"
         }
@@ -292,7 +303,7 @@ async def run_network_anomaly_test(agents, dashboard_server):
         # Add an event
         await dashboard_server.broadcast_update("event", {
             "agent_type": "diagnostic",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "message": "Anomaly detected: High packet loss (5%) on cell site SITE_123"
         })
         
@@ -312,7 +323,7 @@ async def run_network_anomaly_test(agents, dashboard_server):
         # Add events
         await dashboard_server.broadcast_update("event", {
             "agent_type": "planning",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "message": "Generated plan to resolve packet loss issue on cell site SITE_123"
         })
         
@@ -320,7 +331,7 @@ async def run_network_anomaly_test(agents, dashboard_server):
         
         await dashboard_server.broadcast_update("event", {
             "agent_type": "execution",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "message": "Executing network adjustments to reduce packet loss"
         })
         
@@ -333,7 +344,7 @@ async def run_network_anomaly_test(agents, dashboard_server):
             "throughput": 1050.0,
             "jitter": 3.0,
             "signal_strength": -65.0,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "cell_id": "SITE_123",
             "region": "REGION_A"
         }
@@ -344,7 +355,7 @@ async def run_network_anomaly_test(agents, dashboard_server):
         
         await dashboard_server.broadcast_update("event", {
             "agent_type": "validation",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "message": "Validated solution: Packet loss reduced from 5% to 0.5%"
         })
         
@@ -395,8 +406,8 @@ async def main():
         
         # Set up agents
         agents = await setup_agents(
-            mcp_url=f"http://localhost:{args.mcp_port}",
-            acp_broker_url=f"ws://localhost:{args.acp_port}"
+            mcp_url=f"http://127.0.0.1:{args.mcp_port}",
+            acp_broker_url=f"ws://127.0.0.1:{args.acp_port}"
         )
         
         if agents:

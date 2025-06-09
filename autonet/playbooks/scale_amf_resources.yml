@@ -1,0 +1,89 @@
+---
+- name: Scale AMF Resources
+  hosts: localhost
+  gather_facts: no
+  vars:
+    target_cpu_limit: "{{ cpu_limit | default('2000m') }}"
+    target_memory_limit: "{{ memory_limit | default('4Gi') }}"
+    component: "{{ component | default('amf') }}"
+    anomaly_id: "{{ anomaly_id | default('unknown') }}"
+    severity: "{{ severity | default('MEDIUM') }}"
+  
+  tasks:
+    - name: Log scaling action start
+      debug:
+        msg: |
+          =================================================
+          ANSIBLE PLAYBOOK EXECUTION STARTED
+          =================================================
+          Playbook: Scale AMF Resources
+          Anomaly ID: {{ anomaly_id }}
+          Component: {{ component }}
+          Severity: {{ severity }}
+          Target CPU: {{ target_cpu_limit }}
+          Target Memory: {{ target_memory_limit }}
+          Timestamp: {{ ansible_date_time.iso8601 }}
+          =================================================
+
+    - name: Create deployment backup (simulation)
+      debug:
+        msg: "DEMO: Creating backup of current AMF deployment configuration"
+
+    - name: Update AMF container resources (Kubernetes simulation)
+      debug:
+        msg: |
+          DEMO: Updating Kubernetes deployment with following configuration:
+          ---
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: amf-deployment
+            namespace: 5g-core
+          spec:
+            template:
+              spec:
+                containers:
+                - name: amf
+                  resources:
+                    limits:
+                      cpu: "{{ target_cpu_limit }}"
+                      memory: "{{ target_memory_limit }}"
+                    requests:
+                      cpu: "{{ (target_cpu_limit | regex_replace('m', '') | int * 0.5) | int }}m"
+                      memory: "{{ (target_memory_limit | regex_replace('Gi', '') | int * 0.5) | int }}Gi"
+
+    - name: Wait for deployment rollout (simulation)
+      debug:
+        msg: "DEMO: Waiting 30 seconds for deployment rollout to complete..."
+      
+    - name: Verify AMF service health
+      debug:
+        msg: "DEMO: Health check - AMF service responding normally"
+
+    - name: Update monitoring metrics
+      debug:
+        msg: "DEMO: Updated monitoring with new resource allocation"
+
+    - name: Log scaling action completion
+      debug:
+        msg: |
+          =================================================
+          ANSIBLE PLAYBOOK EXECUTION COMPLETED
+          =================================================
+          Result: SUCCESS
+          Action: AMF resources scaled
+          CPU: {{ target_cpu_limit }}
+          Memory: {{ target_memory_limit }}
+          Duration: ~45 seconds (simulated)
+          Next: Monitor for performance improvement
+          =================================================
+
+    - name: Create execution report
+      debug:
+        msg: |
+          Execution Summary:
+          - Anomaly {{ anomaly_id }} addressed
+          - AMF CPU limit increased to {{ target_cpu_limit }}
+          - AMF memory limit increased to {{ target_memory_limit }}
+          - Expected impact: Reduced registration delays
+          - Monitoring: Continue for 15 minutes

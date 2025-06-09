@@ -5,7 +5,7 @@ import asyncio
 import logging
 import uuid
 from typing import Dict, Any, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from agent.base import ExecutionAgent
 from protocols.mcp.client import MCPClient
@@ -17,9 +17,9 @@ class NetworkExecutionAgent(ExecutionAgent):
     """Agent for executing network configuration and optimization plans."""
     
     def __init__(self, agent_id: Optional[str] = None, name: str = None,
-                 mcp_url: str = "http://localhost:8000",
-                 acp_broker_url: str = "http://localhost:8002",
-                 network_api_url: str = "http://localhost:8003/api/network",
+                 mcp_url: str = "http://127.0.0.1:8000",
+                 acp_broker_url: str = "ws://127.0.0.1:8002",
+                 network_api_url: str = "http://127.0.0.1:8003/api/network",
                  config: Dict[str, Any] = None):
         """Initialize a new network execution agent.
         
@@ -111,7 +111,7 @@ class NetworkExecutionAgent(ExecutionAgent):
         
         for plan_id, plan_data in self.executing_plans.items():
             # Check if the plan has timed out
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             start_time = datetime.fromisoformat(plan_data["start_time"])
             timeout = plan_data.get("timeout", 3600)  # Default 1 hour timeout
             
@@ -234,7 +234,7 @@ class NetworkExecutionAgent(ExecutionAgent):
                 "execution_result": result,
                 "plan_id": plan_id,
                 "agent_id": self.agent_id,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat()
             },
             priority=3,
             confidence=ConfidenceLevel.HIGH,
@@ -298,7 +298,7 @@ class NetworkExecutionAgent(ExecutionAgent):
             "status": "success",
             "command": command,
             "target": target,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "output": f"Simulated output for {command} on {target}"
         }
         
@@ -319,8 +319,8 @@ class NetworkExecutionAgent(ExecutionAgent):
                 "plan_id": plan_id,
                 "status": "failed",
                 "error": "Plan contains no steps to execute",
-                "start_time": datetime.utcnow().isoformat(),
-                "end_time": datetime.utcnow().isoformat(),
+                "start_time": datetime.now(timezone.utc).isoformat(),
+                "end_time": datetime.now(timezone.utc).isoformat(),
                 "executed_by": self.agent_id
             }
             
@@ -328,7 +328,7 @@ class NetworkExecutionAgent(ExecutionAgent):
         result = {
             "plan_id": plan_id,
             "status": "in_progress",
-            "start_time": datetime.utcnow().isoformat(),
+            "start_time": datetime.now(timezone.utc).isoformat(),
             "executed_by": self.agent_id,
             "steps_total": len(steps),
             "steps_completed": 0,
@@ -354,7 +354,7 @@ class NetworkExecutionAgent(ExecutionAgent):
                 "step_id": step_id,
                 "name": step_name,
                 "status": "in_progress",
-                "start_time": datetime.utcnow().isoformat()
+                "start_time": datetime.now(timezone.utc).isoformat()
             }
             
             try:
@@ -396,7 +396,7 @@ class NetworkExecutionAgent(ExecutionAgent):
                 result["steps_failed"] += 1
             finally:
                 # Finalize step result
-                step_result["end_time"] = datetime.utcnow().isoformat()
+                step_result["end_time"] = datetime.now(timezone.utc).isoformat()
                 step_result["duration"] = (datetime.fromisoformat(step_result["end_time"]) - 
                                          datetime.fromisoformat(step_result["start_time"])).total_seconds()
                 result["step_results"].append(step_result)
@@ -409,7 +409,7 @@ class NetworkExecutionAgent(ExecutionAgent):
                 self.executing_plans[plan_id] = result
         
         # Finalize execution result
-        end_time = datetime.utcnow().isoformat()
+        end_time = datetime.now(timezone.utc).isoformat()
         result.update({
             "status": "completed" if result["steps_failed"] == 0 else "partial",
             "end_time": end_time,
@@ -445,7 +445,7 @@ class NetworkExecutionAgent(ExecutionAgent):
         # Default response for other message types
         return {
             "status": "acknowledged",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "execution_agent": self.agent_id
         }
         

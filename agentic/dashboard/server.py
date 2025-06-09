@@ -92,6 +92,40 @@ class DashboardServer:
                 }
             return {"status": "error", "message": "Orchestration service not available"}
         
+        # API to get specific agent
+        @self.app.get("/api/agents/{agent_id}")
+        async def get_agent(agent_id: str):
+            if self.orchestration_service:
+                agent = self.orchestration_service.agent_registry.get(agent_id)
+                if agent:
+                    return {"status": "success", "agent": agent.dict()}
+                return {"status": "error", "message": f"Agent {agent_id} not found"}
+            return {"status": "error", "message": "Orchestration service not available"}
+        
+        # API to get agent messages (placeholder for now)
+        @self.app.get("/api/agents/{agent_id}/messages")
+        async def get_agent_messages(agent_id: str):
+            if self.orchestration_service:
+                agent = self.orchestration_service.agent_registry.get(agent_id)
+                if agent:
+                    # For now, return placeholder messages
+                    # In a real implementation, this would fetch actual message history
+                    messages = [
+                        {
+                            "type": "INFO",
+                            "content": f"Agent {agent.name} initialized successfully",
+                            "timestamp": agent.last_seen.isoformat()
+                        },
+                        {
+                            "type": "STATUS",
+                            "content": f"Agent status: {agent.status}",
+                            "timestamp": agent.last_seen.isoformat()
+                        }
+                    ]
+                    return {"status": "success", "messages": messages}
+                return {"status": "error", "message": f"Agent {agent_id} not found"}
+            return {"status": "error", "message": "Orchestration service not available"}
+        
         # API to get workflows
         @self.app.get("/api/workflows")
         async def get_workflows():
@@ -122,7 +156,13 @@ class DashboardServer:
                     # Wait for messages from client (not used now, just keep connection alive)
                     data = await websocket.receive_text()
             except WebSocketDisconnect:
-                self.websocket_clients.remove(websocket)
+                # Safely remove websocket if it exists in the list
+                if websocket in self.websocket_clients:
+                    self.websocket_clients.remove(websocket)
+            except Exception as e:
+                # Handle any other exceptions and safely remove websocket
+                if websocket in self.websocket_clients:
+                    self.websocket_clients.remove(websocket)
         
     async def broadcast_update(self, event_type: str, data: Any):
         """Broadcast an update to all connected dashboard clients.

@@ -77,6 +77,8 @@ Then open your browser and navigate to:
 http://localhost:8080
 ```
 
+**✅ System Status: Fully Functional** - All WebSocket connection issues have been resolved and the system works seamlessly.
+
 ![](https://raw.githubusercontent.com/open-experiments/Telco-AIX/refs/heads/main/agentic/images/agentic.png)<br>
 
 You'll see the dashboard with real-time visualization of agent activities, network telemetry, and workflow status.
@@ -147,24 +149,34 @@ The entire workflow is managed by the orchestration service, which ensures prope
 
 ## Troubleshooting
 
-### WebSocket Connection Issues
-
-If you see errors like:
-```
-WARNING: No supported WebSocket library detected
-```
-
-Install the required WebSocket support:
+### Prerequisites
+Make sure you have installed the WebSocket support:
 ```bash
 pip install websockets
 ```
 
-### Agent Communication Errors
+### Service URLs
+- **MCP Server**: http://localhost:8000
+- **ACP Broker**: http://localhost:8002  
+- **Dashboard**: http://localhost:8080
 
-If agents cannot communicate with each other:
-1. Ensure the ACP broker is running
-2. Confirm there are no firewall rules blocking the ports
-3. Verify all services are using the correct host/port configurations
+### Health Checks
+You can verify services are running:
+```bash
+# Check ACP broker health
+curl http://localhost:8002/health
+
+# Check if agents are connected
+curl http://localhost:8002/agents
+```
+
+### Recent Fixes Applied
+- ✅ **WebSocket Connection Issues**: All services now use `127.0.0.1` instead of `localhost` to avoid DNS resolution conflicts
+- ✅ **Service Startup**: Added health check verification before agent initialization
+- ✅ **Timeout Issues**: Enhanced retry logic and connection timeouts
+- ✅ **Python Compatibility**: Updated deprecated `datetime.utcnow()` calls for future Python versions
+- ✅ **Dashboard Issues**: Fixed agent details and workflow details pages with proper API endpoints
+- ✅ **Data Serialization**: Resolved JSON serialization issues with datetime and numpy data types
 
 ## Extending the Framework
 
@@ -222,8 +234,17 @@ agentic/
 ├── dashboard/             # Dashboard web interface
 ├── main.py                # Main application
 ├── dashboard_mode.py      # Dashboard-only mode
+├── CLAUDE.md              # AI assistant guidance for development
 └── requirements.txt       # Python dependencies
 ```
+
+## For AI Assistants
+
+This project includes a `CLAUDE.md` file that provides specific guidance for AI assistants working with this codebase, including:
+- Architecture overview and key components
+- Essential commands and troubleshooting steps  
+- Development workflow information
+- Implementation notes and best practices
 
 
 ## Disclaimer
