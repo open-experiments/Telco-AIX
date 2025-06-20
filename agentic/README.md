@@ -246,6 +246,9 @@ This project includes a `CLAUDE.md` file that provides specific guidance for AI 
 - Development workflow information
 - Implementation notes and best practices
 
+'''
+CLAUDE.md file is not available in repo
+'''
 
 ## Disclaimer
 

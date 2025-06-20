@@ -41,6 +41,11 @@ Open5Gs Controller
   - Ask about config values and their impact  
   - LLM provides context-aware descriptions
 
+- Ccross layer corelation use cases  
+  - Auto scaling 
+  - Auto healing
+  - Service assurace like a NOC KPI reporting 
+
 ## Components
 
 TODO:
