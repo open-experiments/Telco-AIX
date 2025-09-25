@@ -1,6 +1,5 @@
 # Telco-AIX SME Web Interface
 **🎥 Demo Video**: [Watch on YouTube](https://youtu.be/UQB1T-ThQBk) <br>
-**🌐 Live Demo**: [Access the App](http://telco-sme-tme-aix.apps.sandbox01.narlabs.io/?__theme=dark)
 
 ![Web UI Screenshot](images/webui2.png)
 
