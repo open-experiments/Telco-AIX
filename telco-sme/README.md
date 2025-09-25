@@ -1,19 +1,20 @@
 # Telco-AIX SME Web Interface
 **🎥 Demo Video**: [Watch on YouTube](https://youtu.be/UQB1T-ThQBk) <br>
+**🌐 Live Demo**: [Access the App](http://telco-sme-tme-aix.apps.sandbox01.narlabs.io/?__theme=dark)
 
 ![Web UI Screenshot](images/webui2.png)
 
 ## Overview
-The Telco-AIX SME (Subject Matter Expert) Web Interface is a genai web ui designed for telecommunications professionals to augment their daily operations. It provides AI-powered (Qwen3-32B Full Model Running on RHOAI-vLLM Runtime) conversations with specialized knowledge in telco technologies, network architecture, and technical solutions.
+The Telco-AIX SME (Subject Matter Expert) Web Interface is an advanced GenAI web application designed for telecommunications professionals to augment their daily operations. It provides AI-powered conversations with specialized knowledge in telco technologies, network architecture, and technical solutions.
 
-We gather & visualize realtime metrics and diagnostics information provided by vLLM runtime. 
+The application features real-time metrics visualization and diagnostics from the vLLM runtime, comprehensive session management, and multiple expert personas for domain-specific assistance. 
 ## Features
 
 ### 🤖 **AI-Powered Conversations**
-- **Multiple Expert Personas**: Choose from specialized system prompts for different domains
+- **Multiple Expert Personas**: 7+ specialized system prompts for different domains
 - **Intelligent Responses**: Context-aware AI with telecommunications expertise
-- **Smart Streaming**: Automatic streaming for large contexts and responses
-- **File Upload Support**: Attach and analyze technical documents
+- **Smart Streaming**: Automatic streaming for contexts over 4000 tokens
+- **File Upload Support**: Attach and analyze technical documents (txt, md, csv, json, py, pdf)
 
 ### 📂 **Persistent Sessions**
 - **Session Management**: Create, load, and manage conversation sessions
@@ -24,36 +25,44 @@ We gather & visualize realtime metrics and diagnostics information provided by v
 
 ### ⚙️ **Advanced Configuration**
 - **Temperature Control**: Adjust AI creativity (0=focused, 1=creative)
-- **Token Limits**: Configure response length up to 8192 tokens
-- **System Prompts**: 5 specialized expert personas plus custom options
+- **Token Limits**: Configure response length up to 20,000 tokens
+- **System Prompts**: 7+ specialized expert personas plus custom options
 - **Real-time Settings**: All parameters update dynamically
+- **Context Management**: Auto-streaming for large contexts (>4000 tokens)
 
 ### 🎯 **Expert Domains**
-1. **Default Assistant** - Systematic problem-solving approach
-2. **Network Expert** - Network architecture and SDN/NFV
-3. **Telco Expert** - 5G/6G, RAN, Core networks, standards
-4. **Cloud Expert** - Cloud Tech Expert
-5. **Storage Expert** - Storage Matters
+1. **Default Assistant** - Precision-focused AI with executive-level clarity
+2. **Network Expert** - 20+ years expertise in enterprise/SP networks, SD-WAN, SASE
+3. **Telco Expert** - 5G/6G specialist with vendor ecosystem knowledge
+4. **Cloud Expert** - Multi-cloud architect with FinOps and DevOps expertise
+5. **Storage Expert** - Petabyte-scale storage infrastructure design
+6. **CustomerSupport-IntentClassifier** - Telecom customer service intent classification
+7. **Custom** - Create your own expert persona
 
-## Observability
-We periodically pull metrics from vllm /metrics endpoint
+## 📊 **Observability & Metrics**
+The application includes comprehensive metrics collection and visualization:
+- **Real-time Metrics**: Pull metrics from vLLM `/metrics` endpoint
+- **Performance Monitoring**: Request counts, latency, token throughput
+- **Resource Utilization**: GPU usage, cache hit rates, memory consumption
+- **Interactive Dashboards**: Plotly-based visualizations with detailed insights
+
 ![Web UI Screenshot](images/vllm-metrics.png)
 
 ## Installation
 
 ### Prerequisites
 - Python 3.8 or higher
-- Required packages (see requirements.txt)
+- Required packages (see requirements-v2.txt)
 
 ### Setup
 1. Clone or download the repository
 2. Install dependencies:
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements-v2.txt
    ```
 3. Run the application:
    ```bash
-   python sme-web-ui.py
+   python sme-web-ui-v2.py
    ```
 4. Access the web interface at: `http://localhost:30180`
 
@@ -77,9 +86,10 @@ We periodically pull metrics from vllm /metrics endpoint
 - **Cleanup**: Expired sessions automatically removed after 24 hours
 
 ### File Uploads
-- **Supported Formats**: .txt, .md, .csv, .json, .py
+- **Supported Formats**: .txt, .md, .csv, .json, .py, .pdf (with PyPDF2)
 - **Size Limit**: 3,500 characters to prevent timeouts
 - **One-time Use**: Files apply only to current message, not subsequent ones
+- **PDF Support**: Optional - requires PyPDF2 installation
 
 ## System Prompts Configuration
 
@@ -108,43 +118,67 @@ System prompts are loaded from `system_prompts.json`, making it easy to customiz
 
 ## Architecture
 
-### Components
-- **SessionManager**: File-based session persistence using pickle
-- **ChatClient**: HTTP client with streaming support and retries
-- **ChatInterface**: Main UI logic and event handling
-- **SystemPrompts**: Dynamic prompt loading and management
+### Core Components
+- **SessionManager**: File-based session persistence using pickle with 24-hour TTL
+- **ChatClient**: Advanced HTTP client with streaming support and exponential backoff retries
+- **ChatInterface**: Gradio-based UI with real-time updates and event handling
+- **SystemPromptsManager**: Dynamic prompt loading and runtime editing
+- **MetricsCollector**: Real-time metrics collection and visualization
+- **EmbeddingClient**: Embeddings API integration for semantic search
 
 ### Technical Features
-- **Smart Context Management**: Automatic streaming for large contexts
-- **Retry Logic**: Robust error handling with exponential backoff
+- **Smart Context Management**: Automatic streaming for contexts >4000 tokens
+- **Retry Logic**: Robust error handling with configurable max attempts (default: 5)
 - **Thread Safety**: Concurrent request handling with processing locks
-- **Memory Optimization**: Context size limits and history management
+- **Memory Optimization**: Context limits up to 20,000 tokens
+- **Token Authentication**: Bearer token support for API security
+- **Timeout Configuration**: Separate timeouts for streaming (10min) and non-streaming (4min)
 
 ### File Structure
 ```
-├── sme-web-ui.py           # Main application
-├── system_prompts.json     # Expert persona definitions
+├── sme-web-ui-v2.py        # Main application (enhanced version)
+├── system_prompts.json     # Expert persona definitions (7+ personas)
 ├── sessions/               # Session storage directory (auto-created)
-├── requirements.txt        # Python dependencies
-├── webui.png              # Web interface screenshot
+├── requirements-v2.txt     # Python dependencies
+├── benchmarks/            # GenAI benchmark tests for vendors
+├── models/                # Model-specific configurations
+├── telcos-last-exam/      # Telco exam questions and comparisons
+├── images/                # Screenshots and documentation images
+├── CLAUDE.md              # Claude Code guidance file
+├── .gitignore             # Git ignore configuration
 └── README.md              # This documentation
 ```
 
 ## Configuration
 
-### Environment Variables
-Serving Selected Model Qwen3-32B Full Model that runs on RHOAI-ModelServing with vLLM RunTime with NVIDIA Acceleration. We have tested with Single RTX 6000 Blackwell 96GB Card.
+### API Configuration
+The application is configured to work with vLLM-served models. Update the `Config` class in `sme-web-ui-v2.py`:
+
+```python
+class Config:
+    api_endpoint: str = "https://your-api-url"
+    model_name: str = "your-model-name"
+    api_token: str = "your-api-key"  # Optional
+    use_token_auth: bool = True
+```
+
+### Model Deployment
+Currently configured for OpenAI-compatible endpoints. The application has been tested with:
+- **vLLM Runtime**: OpenAI-compatible serving
+- **Hardware**: NVIDIA GPU acceleration recommended
+- **Model Format**: Any model compatible with vLLM serving
+
+### Live Deployment Example
 ![Model Serving](images/modelserving.png)
-- Model-Car Image URI: `oci://docker.io/efatnar/modelcar-qwen3-32b:latest`
-- Default API endpoint: `https://qwen3-32b-vllm-latest-tme-aix.apps.sandbox01.narlabs.io`
-- Model: `qwen3-32b-vllm-latest`
-- Port: `30180`
-- SSL verification disabled for development environments
+- **Live Instance**: http://telco-sme-tme-aix.apps.sandbox01.narlabs.io
+- **Port**: 30180
+- **SSL**: Verification disabled for development (configurable)
 
 ### Customization
-- Edit `Config` class in `sme-web-ui.py` for API endpoints
+- Edit `Config` class in `sme-web-ui-v2.py` for API endpoints
 - Modify `system_prompts.json` for expert personas
-- Adjust timeout and retry settings as needed
+- Adjust timeout and retry settings in Config class
+- Configure embeddings API separately if needed
 
 ## Troubleshooting
 
@@ -153,16 +187,9 @@ Serving Selected Model Qwen3-32B Full Model that runs on RHOAI-ModelServing with
 - **Session Loading**: Verify session ID format (8 characters)
 - **Prompt Errors**: Validate JSON syntax in system_prompts.json
 - **Performance**: Reduce context size or max tokens for faster responses
-- **Model Download Issues**: Create a DockerHub Access Secret and Attach to Default Service Account
-```
-oc create secret docker-registry dockerhub-secret \
-  --docker-server=docker.io \
-  --docker-username=your_docker_username \
-  --docker-password='YOUR_NEW_PAT_HERE' \
-  --docker-email=your-email@example.com
-
-oc patch serviceaccount default -p '{"imagePullSecrets": [{"name": "dockerhub-secret"}]}'
-```
+- **PDF Processing**: Install PyPDF2 if PDF support is needed: `pip install PyPDF2`
+- **Metrics Visualization**: Install Plotly for enhanced metrics: `pip install plotly`
+- **Token Authentication**: Ensure API token is correctly configured in Config class
 
 ### Diagnostics
 1. Go to "🔧 Diagnostics" tab
@@ -177,9 +204,35 @@ oc patch serviceaccount default -p '{"imagePullSecrets": [{"name": "dockerhub-se
 ## Development
 
 ### Key Files
-- `sme-web-ui.py`: Main application with all classes and UI
-- `system_prompts.json`: Expert persona definitions
-- `requirements.txt`: Python package dependencies
+- `sme-web-ui-v2.py`: Enhanced main application with all classes and UI
+- `system_prompts.json`: Expert persona definitions (7+ specialized personas)
+- `requirements-v2.txt`: Python package dependencies
+- `CLAUDE.md`: Development guidance for Claude Code
 
+### Key Classes
+- **Config**: Application configuration and API settings
+- **SessionManager**: Persistent session management with file-based storage
+- **ChatClient**: HTTP client for API communication with streaming support
+- **ChatInterface**: Gradio UI implementation
+- **MetricsCollector**: Real-time metrics collection and processing
+- **EmbeddingClient**: Embeddings API integration
 
-**Note**: This interface is designed for professional telecommunications use cases and requires appropriate model access and configuration.
+### Features in Development
+- Enhanced metrics visualization with Plotly
+- Embeddings support for semantic search
+- Advanced session management with collaboration features
+- Real-time diagnostics and health monitoring
+
+## Contributing
+
+When contributing to this project:
+1. Update the `CLAUDE.md` file if adding new features
+2. Test with the live deployment if possible
+3. Ensure all expert personas remain functional
+4. Update this README with any new features or changes
+
+## License
+
+This project is part of the Telco-AIX initiative for telecommunications AI augmentation.
+
+**Note**: This interface is designed for professional telecommunications use cases and requires appropriate API endpoint configuration.
