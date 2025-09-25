@@ -1,7 +1,7 @@
 # Telco-AIX SME Web Interface
 **🎥 Demo Video**: [Watch on YouTube](https://youtu.be/UQB1T-ThQBk) <br>
 
-![Web UI Screenshot](webui.png)
+![Web UI Screenshot](webui2.png)
 
 ## Overview
 The Telco-AIX SME (Subject Matter Expert) Web Interface is a genai web ui designed for telecommunications professionals to augment their daily operations. It provides AI-powered (Qwen3-32B Full Model Running on RHOAI-vLLM Runtime) conversations with specialized knowledge in telco technologies, network architecture, and technical solutions.
@@ -34,6 +34,10 @@ We gather & visualize realtime metrics and diagnostics information provided by v
 3. **Telco Expert** - 5G/6G, RAN, Core networks, standards
 4. **Cloud Expert** - Cloud Tech Expert
 5. **Storage Expert** - Storage Matters
+
+## Observability
+We periodically pull metrics from vllm /metrics endpoint
+![Web UI Screenshot](vllm-metrics.png)
 
 ## Installation
 
