@@ -37,7 +37,7 @@ We gather & visualize realtime metrics and diagnostics information provided by v
 
 ## Observability
 We periodically pull metrics from vllm /metrics endpoint
-![Web UI Screenshot]images(images/vllm-metrics.png)
+![Web UI Screenshot](images/vllm-metrics.png)
 
 ## Installation
 
