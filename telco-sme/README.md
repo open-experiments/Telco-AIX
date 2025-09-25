@@ -1,7 +1,7 @@
 # Telco-AIX SME Web Interface
 **🎥 Demo Video**: [Watch on YouTube](https://youtu.be/UQB1T-ThQBk) <br>
 
-![Web UI Screenshot](webui2.png)
+![Web UI Screenshot](images/webui2.png)
 
 ## Overview
 The Telco-AIX SME (Subject Matter Expert) Web Interface is a genai web ui designed for telecommunications professionals to augment their daily operations. It provides AI-powered (Qwen3-32B Full Model Running on RHOAI-vLLM Runtime) conversations with specialized knowledge in telco technologies, network architecture, and technical solutions.
@@ -37,7 +37,7 @@ We gather & visualize realtime metrics and diagnostics information provided by v
 
 ## Observability
 We periodically pull metrics from vllm /metrics endpoint
-![Web UI Screenshot](vllm-metrics.png)
+![Web UI Screenshot]images(images/vllm-metrics.png)
 
 ## Installation
 
@@ -134,7 +134,7 @@ System prompts are loaded from `system_prompts.json`, making it easy to customiz
 
 ### Environment Variables
 Serving Selected Model Qwen3-32B Full Model that runs on RHOAI-ModelServing with vLLM RunTime with NVIDIA Acceleration. We have tested with Single RTX 6000 Blackwell 96GB Card.
-![Model Serving](modelserving.png)
+![Model Serving](images/modelserving.png)
 - Model-Car Image URI: `oci://docker.io/efatnar/modelcar-qwen3-32b:latest`
 - Default API endpoint: `https://qwen3-32b-vllm-latest-tme-aix.apps.sandbox01.narlabs.io`
 - Model: `qwen3-32b-vllm-latest`
