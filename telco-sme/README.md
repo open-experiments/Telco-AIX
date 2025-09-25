@@ -166,12 +166,7 @@ Currently configured for OpenAI-compatible endpoints. The application has been t
 - **vLLM Runtime**: OpenAI-compatible serving
 - **Hardware**: NVIDIA GPU acceleration recommended
 - **Model Format**: Any model compatible with vLLM serving
-
-### Live Deployment Example
 ![Model Serving](images/modelserving.png)
-- **Live Instance**: http://telco-sme-tme-aix.apps.sandbox01.narlabs.io
-- **Port**: 30180
-- **SSL**: Verification disabled for development (configurable)
 
 ### Customization
 - Edit `Config` class in `sme-web-ui-v2.py` for API endpoints
