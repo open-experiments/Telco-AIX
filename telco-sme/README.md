@@ -1,12 +1,13 @@
-# Telco-AIX SME Web Interface
+# Telco Subject Matter Expert (SME) Portal
 **🎥 Demo Video**: [Watch on YouTube](https://youtu.be/UQB1T-ThQBk) <br>
 
 ![Web UI Screenshot](images/webui2.png)
 
 ## Overview
-The Telco-AIX SME (Subject Matter Expert) Web Interface is an advanced GenAI web application designed for telecommunications professionals to augment their daily operations. It provides AI-powered conversations with specialized knowledge in telco technologies, network architecture, and technical solutions.
+The Telco-AIX SME (Subject Matter Expert) Portal is a GenAI web application designed for telecom professionals to augment their daily operations. It provides AI-powered conversations with specialized knowledge in telco technologies, network architecture, and technical solutions powered with a well benchmarked models and in-purpose built expert prompts. We also offer glimse of embeddings generation and in-memory embeddings search.
 
-The application features real-time metrics visualization and diagnostics from the vLLM runtime, comprehensive session management, and multiple expert personas for domain-specific assistance. 
+The app-stack also features real-time metrics visualization and diagnostics from the vLLM runtime, session management, and multiple expert personas for domain-specific assistance. 
+
 ## Features
 
 ### 🤖 **AI-Powered Conversations**
