@@ -144,8 +144,6 @@ System prompts are loaded from `system_prompts.json`, making it easy to customiz
 ├── models/                # Model-specific configurations
 ├── telcos-last-exam/      # Telco exam questions and comparisons
 ├── images/                # Screenshots and documentation images
-├── CLAUDE.md              # Claude Code guidance file
-├── .gitignore             # Git ignore configuration
 └── README.md              # This documentation
 ```
 
