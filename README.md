@@ -24,6 +24,7 @@ Welcome to the **Telco-AIX** collaborative experimental workspace –> where we 
 | 🖥️ Network Operations | [NoC AI Augmentation](https://github.com/tme-osx/Telco-AIX/tree/main/5gprod) | OSS Optimization |
 | 🎩 IT Management | [ITSM Automation](https://github.com/tme-osx/Telco-AIX/tree/main/itsm-ai-automation) | Intelligent Service Management |
 | 🤖 Agentic Telco-AI | [Agentic Framework](https://github.com/tme-osx/Telco-AIX/tree/main/agentic) <br> [Autonomous 5G Network](https://github.com/open-experiments/Telco-AIX/tree/main/autonet)| Agentic Telco |
+| 🔍 SME Portal | [One Stop KnowHow Shop](https://github.com/open-experiments/Telco-AIX/tree/main/telco-sme) | Prompt Engineering & Embeddings Search |
 
 ## 🥚 Easter Egg
 
