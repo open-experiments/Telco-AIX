@@ -1,4 +1,4 @@
-# Telco Subject Matter Expert (SME) Portal
+no# Telco Subject Matter Expert (SME) Portal
 **🎥 Demo Video**: [Watch on YouTube](https://youtu.be/UQB1T-ThQBk) <br>
 
 ![Web UI Screenshot](images/webui2.png)
@@ -200,8 +200,6 @@ Currently configured for OpenAI-compatible endpoints. The application has been t
 - `sme-web-ui-v2.py`: Enhanced main application with all classes and UI
 - `system_prompts.json`: Expert persona definitions (7+ specialized personas)
 - `requirements-v2.txt`: Python package dependencies
-- `CLAUDE.md`: Development guidance for Claude Code
-
 ### Key Classes
 - **Config**: Application configuration and API settings
 - **SessionManager**: Persistent session management with file-based storage
