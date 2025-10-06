@@ -1,4 +1,4 @@
-no# Telco Subject Matter Expert (SME) Portal
+# Telco Subject Matter Expert (SME) Portal
 **🎥 Demo Video**: [Watch on YouTube](https://youtu.be/UQB1T-ThQBk) <br>
 
 ![Web UI Screenshot](images/webui2.png)
