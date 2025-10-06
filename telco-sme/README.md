@@ -165,6 +165,10 @@ class Config:
 Currently configured for OpenAI-compatible endpoints. The application has been tested with:
 - **vLLM Runtime**: OpenAI-compatible serving
 - **Hardware**: NVIDIA GPU acceleration recommended
+- **Reference Model Image**: oci://docker.io/efatnar/qwen3-30b-a3b-fp8:latest <br>
+  - vLLM Serving Config:
+     - --max-model-len=24576
+     - --gpu-memory-utilization=0.95
 - **Model Format**: Any model compatible with vLLM serving
 ![Model Serving](images/modelserving.png)
 
