@@ -1,5 +1,6 @@
 # Telco Subject Matter Expert (SME) Portal
 **🎥 Demo Video**: [Watch on YouTube](https://youtu.be/UQB1T-ThQBk) <br>
+**📖 Article**: [Read on Medium](https://medium.com/open-5g-hypercore/episode-xxix-the-prompt-engineering-how-to-make-a-toddler-act-talk-nice-83e9aab2e3b9)
 
 ![Web UI Screenshot](images/webui2.png)
 
