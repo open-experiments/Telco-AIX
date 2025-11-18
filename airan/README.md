@@ -33,12 +33,6 @@ Demonstrates how deep learning can replace conventional channel estimation + equ
 
 ```
 aerial-airan/
-├── container/
-│   └── Dockerfile                         # Custom RHOAI workbench image (Sionna 1.2.1)
-│
-├── manifests/
-│   ├── 01-pvc-airan-workspace.yaml       # 500GB persistent storage
-│   └── 02-workbench-airan-simple.yaml    # GPU-enabled Jupyter workbench
 │
 ├── notebooks/
 │   ├── 00-environment-validation.ipynb   # ✅ Verify Sionna 1.2.1 + TensorFlow + GPU
@@ -49,7 +43,6 @@ aerial-airan/
 │
 ├── setup.sh                               # One-time environment setup script
 ├── requirements.txt                       # Python dependencies
-├── SIONNA-1.2-API-CHANGES.md             # Migration guide from Sionna 0.18.x
 └── README.md                              # This file
 ```
 
