@@ -254,7 +254,7 @@ All notebooks updated for **Sionna 1.2.1** (from 0.18.x):
 
 ---
 
-## 🎉 Acknowledgments
+## Acknowledgments
 
 - **NVIDIA Research** Sionna and neural_rx reference implementation
 - **Apple Radio & Antenna Team** Data Generator and ETL.
