@@ -1,0 +1,22 @@
+# AI-RAN Neural Receiver Dependencies
+# Compatible with TensorFlow 2.16+ (pre-installed in RHOAI workbench)
+
+# Core dependencies
+sionna>=0.19.0          # 5G NR simulation and neural receiver training
+h5py>=3.10.0            # HDF5 dataset storage
+numpy>=1.24.0           # Array operations
+
+# Visualization
+matplotlib>=3.8.0       # Plotting
+seaborn>=0.13.0         # Statistical plots
+
+# Utilities
+tqdm>=4.66.0            # Progress bars
+scipy>=1.11.0           # Interpolation and scientific computing
+
+# Optional: For advanced features
+# tensorrt>=10.0.0      # TensorRT Python API (already in base image)
+# onnx>=1.15.0          # ONNX model export (if needed)
+
+# Note: TensorFlow, CUDA, cuDNN, and PyTorch are pre-installed in the base image
+# registry.redhat.io/rhoai/odh-workbench-jupyter-pytorch-cuda-py312-ubi9
