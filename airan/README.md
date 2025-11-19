@@ -257,7 +257,7 @@ All notebooks updated for **Sionna 1.2.1** (from 0.18.x):
 ## Acknowledgments
 
 - **NVIDIA Research** Sionna and neural_rx reference implementation
-- **Apple Radio & Antenna Team** Data Generator and ETL.
+- **Apple Radio & Antenna Team** L1 Data Generator and Data Prep to Training.
 - **Telco-AIX Team** Sandbox Env & Continous Support.
 
 ---
