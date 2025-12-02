@@ -212,8 +212,6 @@ All notebooks updated for **Sionna 1.2.1** (from 0.18.x):
 - BinarySource removed → `sample_bernoulli([batch, num_bits], p=0.5)`
 - CDL initialization: now requires `PanelArray` objects
 
-**See:** [`SIONNA-1.2-API-CHANGES.md`](SIONNA-1.2-API-CHANGES.md) for full migration guide.
-
 ### GPU Optimization
 
 - **@tf.function compilation** for channel generation
