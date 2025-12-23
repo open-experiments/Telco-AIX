@@ -190,7 +190,7 @@ def main():
     """Run complete workflow"""
     print("\n")
     print("╔═══════════════════════════════════════════════════════════════════╗")
-    print("║       AI-RAN Energy Efficiency Optimization - Quick Start        ║")
+    print("║       AI-RAN Energy Efficiency Optimization - Quick Start         ║")
     print("║                      Powered by JAX                               ║")
     print("╚═══════════════════════════════════════════════════════════════════╝")
 
