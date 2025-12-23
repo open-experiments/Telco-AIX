@@ -25,6 +25,7 @@ Welcome to the **Telco-AIX** collaborative experimental workspace –> where we 
 | 🎩 IT Management | [ITSM Automation](https://github.com/tme-osx/Telco-AIX/tree/main/itsm-ai-automation) | Intelligent Service Management |
 | 🤖 Agentic Telco-AI | [Agentic Framework](https://github.com/tme-osx/Telco-AIX/tree/main/agentic) <br> [Autonomous 5G Network](https://github.com/open-experiments/Telco-AIX/tree/main/autonet)| Agentic Telco |
 | 🥇 Telco Expert Portal | [One Stop KnowHow Shop](https://github.com/open-experiments/Telco-AIX/tree/main/telco-sme) | Prompt Engineering & Embeddings Search |
+| ⚡ AI-RAN  | [Radio Network Energy Efficiency](https://github.com/open-experiments/Telco-AIX/tree/main/airan-energy) | RAN Sustainability |
 
 ## 🥚 Easter Egg
 
