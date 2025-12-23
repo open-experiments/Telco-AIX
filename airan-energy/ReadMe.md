@@ -33,7 +33,7 @@ timestamp,cell_id,cell_type,traffic_mbps,num_users,qos_score,capacity_mbps,utili
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                  AI-RAN Energy Optimization System               │
+│                  AI-RAN Energy Optimization System              │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌──────────────┐    ┌─────────────────┐    ┌──────────────────┐
