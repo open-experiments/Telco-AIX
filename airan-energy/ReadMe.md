@@ -1,7 +1,8 @@
 # AI-RAN Energy Efficiency Optimization with JAX
 
-Energy-efficient cell sleep optimization for 5G Radio Access Networks using JAX-based neural networks and Deep Reinforcement Learning. **First JAX implementation in Telco-AIX.**
+Energy-efficient cell sleep optimization for 5G Radio Access Networks using JAX-based neural networks and Deep Reinforcement Learning.
 
+Team: AWS Kuiper Team Collaboration <br>
 ## 🎯 Key Results
 
 - ⚡ **30-35% Energy Savings** in RAN operations
