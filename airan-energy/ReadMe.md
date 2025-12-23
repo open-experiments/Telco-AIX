@@ -445,12 +445,6 @@ If you use this work in your research, please cite:
 }
 ```
 
-## License
-
-Part of the Telco-AIX collaborative workspace. See main repository LICENSE.
-
-Research papers and standards are cited under fair use for educational and research purposes. All implementations are original work.
-
 ## Acknowledgments
 
 This project builds upon collective knowledge from:
@@ -465,14 +459,6 @@ This project builds upon collective knowledge from:
 - DeepMind (Haiku/Optax)
 - Google Research (Flax)
 
-**Community:**
-- Telco-AIX Contributors
-- Open-source ML community
-
-**Special Thanks:**
-- Fatih E. NAR (Telco-AIX Founder)
-- Alessandro Arrichiello, Ali Bokhari, Atul Deshpande (Maintainers)
-
 ---
 
 **🚀 Ready to reduce your RAN energy consumption by 30%?**
@@ -481,8 +467,3 @@ This project builds upon collective knowledge from:
 
 ---
 
-**Last Updated:** December 7, 2025
-**Status:** Production Ready ✅
-**Lines of Code:** 2,352+
-**Documentation:** 30+ KB
-**IEEE Papers Used:** 5 primary + 2 academic
