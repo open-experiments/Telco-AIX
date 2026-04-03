@@ -28,7 +28,6 @@
 #
 # Author: Fatih E. NAR 
 # Project: https://github.com/open-experiments/Telco-AIX
-# License: Apache 2.0
 #===============================================================================
 set -euo pipefail
 
