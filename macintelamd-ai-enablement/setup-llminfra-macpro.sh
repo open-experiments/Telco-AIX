@@ -26,7 +26,7 @@
 #   ./setup-llminfra-macpro.sh --model "bartowski/Meta-Llama-3.1-70B-Instruct-GGUF" --quant Q4_K_M
 #   ./setup-llminfra-macpro.sh --server
 #
-# Author: Fatih E. NAR (@fenar) & Contributors
+# Author: Fatih E. NAR 
 # Project: https://github.com/open-experiments/Telco-AIX
 # License: Apache 2.0
 #===============================================================================
@@ -105,8 +105,8 @@ check_cmd() {
 #===============================================================================
 echo -e "${CYAN}"
 echo "╔══════════════════════════════════════════════════════════════╗"
-echo "║  Mac Pro 7,1 LLM Inference Setup (Vulkan/MoltenVK)        ║"
-echo "║  GPU-Accelerated AI on AMD Radeon Pro Vega II              ║"
+echo "║  Mac Pro 7,1 LLM Inference Setup (Vulkan/MoltenVK)           ║"
+echo "║  GPU-Accelerated AI on AMD Radeon Pro Vega II                ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo -e "${NC}"
 
@@ -237,14 +237,14 @@ log_step "Step 5/5: Launching inference..."
 if [[ "${SERVER_MODE}" == true ]]; then
     echo -e "${CYAN}"
     echo "╔══════════════════════════════════════════════════════════════╗"
-    echo "║  Starting OpenAI-Compatible API Server                     ║"
-    echo "║  Endpoint: http://localhost:${SERVER_PORT}/v1                        ║"
-    echo "║                                                            ║"
-    echo "║  Test with:                                                ║"
-    echo "║  curl http://localhost:${SERVER_PORT}/v1/chat/completions \\          ║"
-    echo "║    -H 'Content-Type: application/json' \\                   ║"
-    echo "║    -d '{\"model\":\"local\",\"messages\":[{\"role\":\"user\",        ║"
-    echo "║         \"content\":\"Hello!\"}]}'                            ║"
+    echo "║  Starting OpenAI-Compatible API Server                       ║"
+    echo "║  Endpoint: http://localhost:${SERVER_PORT}/v1                ║"
+    echo "║                                                              ║"
+    echo "║  Test with:                                                  ║"
+    echo "║  curl http://localhost:${SERVER_PORT}/v1/chat/completions \\ ║"
+    echo "║    -H 'Content-Type: application/json' \\                    ║"
+    echo "║    -d '{\"model\":\"local\",\"messages\":[{\"role\":\"user\",║"
+    echo "║         \"content\":\"Hello!\"}]}'                           ║"
     echo "╚══════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 
@@ -258,9 +258,9 @@ if [[ "${SERVER_MODE}" == true ]]; then
 else
     echo -e "${CYAN}"
     echo "╔══════════════════════════════════════════════════════════════╗"
-    echo "║  Starting Interactive Chat (Vulkan GPU-Accelerated)        ║"
-    echo "║  Type your message at the > prompt                         ║"
-    echo "║  Type /exit or Ctrl+C to quit                              ║"
+    echo "║  Starting Interactive Chat (Vulkan GPU-Accelerated)          ║"
+    echo "║  Type your message at the > prompt                           ║"
+    echo "║  Type /exit or Ctrl+C to quit                                ║"
     echo "╚══════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 
