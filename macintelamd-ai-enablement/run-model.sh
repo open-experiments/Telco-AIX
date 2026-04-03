@@ -294,10 +294,10 @@ fi
 echo ""
 
 if [[ "${SERVER_MODE}" == true ]]; then
-    echo -e "${CYAN}${BOLD}╔═════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}${BOLD}║  Launching OpenAI-Compatible API Server                     ║${NC}"
-    echo -e "${CYAN}${BOLD}║  Endpoint: http://localhost:${SERVER_PORT}/v1               ║${NC}"
-    echo -e "${CYAN}${BOLD}╚═════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${CYAN}${BOLD}╔══════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}${BOLD}║  Launching OpenAI-Compatible API Server          ║${NC}"
+    echo -e "${CYAN}${BOLD}║  Endpoint: http://localhost:${SERVER_PORT}/v1    ║${NC}"
+    echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "${DIM}  Test: curl http://localhost:${SERVER_PORT}/v1/chat/completions \\${NC}"
     echo -e "${DIM}    -H 'Content-Type: application/json' \\${NC}"
