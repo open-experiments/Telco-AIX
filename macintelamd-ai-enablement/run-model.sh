@@ -60,7 +60,7 @@ MODELS=(
     "bartowski/Qwen_Qwen3.5-35B-A3B-GGUF|Q4_K_M|Qwen 3.5 35B-A3B (MoE)|MoE|~3B active|~20 GB|★ Recommended — proven 37.6 tok/s"
     "bartowski/Qwen_Qwen3.5-9B-GGUF|Q8_0|Qwen 3.5 9B (Q8)|Dense|9B|~10 GB|Higher quality, slightly slower"
     "bartowski/Qwen_Qwen3.5-27B-GGUF|Q8_0|Qwen 3.5 27B (Q8)|Dense|27B|~29 GB|High quality reasoning"
-    "bartowski/Qwen_Qwen3.5-122B-A10B-GGUF|Q4_K_M|Qwen 3.5 122B-A10B (MoE)|MoE|~10B active|~62 GB|Large MoE — pushes VRAM limit"
+    "bartowski/Qwen_Qwen3.5-122B-A10B-GGUF|Q4_K_M|Qwen 3.5 122B-A10B (MoE)|MoE|~10B active|~62 GB|Fits in VRAM — large MoE with headroom"
 
     #--- Kimi Family ---
     "bartowski/moonshotai_Kimi-K2-Instruct-0905-GGUF|IQ2_XXS|Kimi K2 Instruct (IQ2)|MoE|~32B active|~120 GB|1T MoE — needs RAM spillover"
@@ -123,16 +123,62 @@ while [[ $# -gt 0 ]]; do
 done
 
 #-------------------------------------------------------------------------------
-# Validate llama.cpp installation
+# Validate llama.cpp installation & Vulkan backend
 #-------------------------------------------------------------------------------
 CLI_BIN="${LLAMA_CPP_DIR}/build/bin/llama-cli"
 SRV_BIN="${LLAMA_CPP_DIR}/build/bin/llama-server"
+VULKAN_LIB="${LLAMA_CPP_DIR}/build/bin/libggml-vulkan.dylib"
+METAL_LIB="${LLAMA_CPP_DIR}/build/bin/libggml-metal.dylib"
 
+echo -e "\n${CYAN}▸ Pre-flight checks...${NC}"
+
+# Check binaries
 if [[ ! -f "${CLI_BIN}" ]] || [[ ! -f "${SRV_BIN}" ]]; then
     echo -e "${RED}✖ llama.cpp binaries not found at ${LLAMA_CPP_DIR}/build/bin/${NC}"
     echo -e "${YELLOW}  Run setup-llminfra-macpro.sh first to build llama.cpp with Vulkan.${NC}"
     exit 1
 fi
+echo -e "${GREEN}✔ llama.cpp binaries found${NC}"
+
+# CRITICAL: Verify Vulkan backend was compiled
+if [[ ! -f "${VULKAN_LIB}" ]]; then
+    echo -e "${RED}✖ Vulkan backend NOT found: ${VULKAN_LIB}${NC}"
+    echo -e "${RED}  llama.cpp was built WITHOUT Vulkan — inference will fall back to CPU!${NC}"
+    echo -e "${YELLOW}  Rebuild with: cmake -B build -DGGML_VULKAN=ON -DGGML_METAL=OFF${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✔ Vulkan backend: $(basename "${VULKAN_LIB}")${NC}"
+
+# CRITICAL: Warn if Metal backend is also present (it takes priority and breaks AMD GPUs)
+if [[ -f "${METAL_LIB}" ]]; then
+    echo -e "${RED}✖ Metal backend ALSO found: ${METAL_LIB}${NC}"
+    echo -e "${RED}  Metal takes priority over Vulkan and produces garbage on AMD GPUs!${NC}"
+    echo -e "${YELLOW}  Rebuild with: cmake -B build -DGGML_VULKAN=ON -DGGML_METAL=OFF${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✔ Metal backend absent (correct for AMD GPU)${NC}"
+
+# Check MoltenVK / Vulkan loader availability
+if command -v vulkaninfo &>/dev/null; then
+    VULKAN_DEVS=$(vulkaninfo --summary 2>/dev/null | grep -c "GPU" || true)
+    if [[ "${VULKAN_DEVS}" -gt 0 ]]; then
+        echo -e "${GREEN}✔ Vulkan devices detected: ${VULKAN_DEVS} GPU(s)${NC}"
+        vulkaninfo --summary 2>/dev/null | grep "deviceName" | while read -r line; do
+            echo -e "  ${DIM}${line}${NC}"
+        done
+    else
+        echo -e "${YELLOW}⚠ vulkaninfo found no GPUs — MoltenVK may not be configured${NC}"
+    fi
+elif [[ -d "/opt/homebrew/share/vulkan" ]] || [[ -d "/usr/local/share/vulkan" ]]; then
+    echo -e "${GREEN}✔ Vulkan/MoltenVK libraries present via Homebrew${NC}"
+else
+    echo -e "${YELLOW}⚠ Cannot verify Vulkan devices (vulkaninfo not in PATH)${NC}"
+    echo -e "${DIM}  Install with: brew install vulkan-tools (optional, for diagnostics)${NC}"
+fi
+
+# Display VRAM summary
+echo -e "${GREEN}✔ Target: 128 GB HBM2 across 4 Vega II dies (32 GB/die)${NC}"
+echo ""
 
 #-------------------------------------------------------------------------------
 # Display model catalog
@@ -153,9 +199,9 @@ print_catalog() {
         local color="${GREEN}"
         local vram_num
         vram_num=$(echo "${vram}" | grep -oE '[0-9]+')
-        if [[ ${vram_num} -gt 64 ]]; then
+        if [[ ${vram_num} -gt 128 ]]; then
             color="${RED}"
-        elif [[ ${vram_num} -gt 50 ]]; then
+        elif [[ ${vram_num} -gt 100 ]]; then
             color="${YELLOW}"
         fi
 
@@ -172,7 +218,7 @@ print_catalog() {
 
     echo ""
     echo -e "  ${GREEN}■${NC} Fits in VRAM    ${YELLOW}■${NC} Tight fit    ${RED}■${NC} Needs RAM spillover"
-    echo -e "  ${DIM}VRAM pool: 64 GB HBM2 across 4 Vega II dies + 256 GB system RAM for spillover${NC}"
+    echo -e "  ${DIM}VRAM pool: 128 GB HBM2 across 4 Vega II dies (32 GB/die) + 256 GB system RAM for spillover${NC}"
     echo ""
 }
 
@@ -266,5 +312,6 @@ else
         -hf "${HF_MODEL_TAG}" \
         -ngl "${NUM_GPU_LAYERS}" \
         -c "${CONTEXT_SIZE}" \
-        --repeat-penalty "${REPEAT_PENALTY}"
+        --repeat-penalty "${REPEAT_PENALTY}" \
+        --no-mmproj
 fi

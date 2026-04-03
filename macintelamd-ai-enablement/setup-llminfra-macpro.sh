@@ -271,5 +271,6 @@ else
         -hf "${HF_MODEL_TAG}" \
         -ngl "${NUM_GPU_LAYERS}" \
         -c "${CONTEXT_SIZE}" \
-        --repeat-penalty "${REPEAT_PENALTY}"
+        --repeat-penalty "${REPEAT_PENALTY}" \
+        --no-mmproj
 fi
