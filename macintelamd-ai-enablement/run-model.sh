@@ -274,6 +274,18 @@ else
         echo -e "${RED}✖ Invalid selection.${NC}"
         exit 1
     fi
+
+    # Ask launch mode if not set via flag
+    if [[ "${SERVER_MODE}" == false ]]; then
+        echo ""
+        echo -e "${BOLD}Launch mode:${NC}"
+        echo -e "  ${GREEN}[1]${NC} Interactive Chat (CLI)"
+        echo -e "  ${GREEN}[2]${NC} OpenAI-Compatible API Server (http://localhost:${SERVER_PORT}/v1)"
+        read -rp "> " mode_choice
+        if [[ "${mode_choice}" == "2" ]]; then
+            SERVER_MODE=true
+        fi
+    fi
 fi
 
 #-------------------------------------------------------------------------------
