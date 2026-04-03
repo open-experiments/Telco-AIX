@@ -781,6 +781,45 @@
             line-height: 1.6;
         }
 
+        /* === COMPANY LOGOS === */
+        .company-logos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+
+        .company-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--cream);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        .company-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-warm);
+        }
+
+        .company-pill i {
+            font-size: 1.2rem;
+        }
+
+        .company-pill.redhat i { color: #EE0000; }
+        .company-pill.aws i { color: #FF9900; }
+        .company-pill.google i { color: #4285F4; }
+        .company-pill.azure i { color: #0078D4; }
+        .company-pill.verizon { color: var(--text); }
+        .company-pill.att { color: var(--text); }
+
         /* === ABOUT / TEAM === */
         .about-content {
             max-width: 800px;
@@ -1749,7 +1788,17 @@
 
                 <div class="about-card reveal">
                     <h3>Key Contributors</h3>
-                    <p>Great minds &amp; talent from <strong>Red Hat</strong> | <strong>AWS</strong> | <strong>Google</strong> | <strong>Verizon</strong> | <strong>AT&amp;T</strong> | <strong>Azure</strong> and others. See our <a href="https://github.com/open-experiments/Telco-AIX/graphs/contributors" target="_blank">contributors in the repo</a>.</p>
+                    <p>Great minds &amp; talent from industry leaders and a growing open-source community.</p>
+                    <div class="company-logos">
+                        <span class="company-pill redhat"><i class="fab fa-redhat"></i> Red Hat</span>
+                        <span class="company-pill aws"><i class="fab fa-aws"></i> AWS</span>
+                        <span class="company-pill google"><i class="fab fa-google"></i> Google</span>
+                        <span class="company-pill azure"><i class="fab fa-microsoft"></i> Azure</span>
+                        <span class="company-pill verizon"><i class="fas fa-signal"></i> Verizon</span>
+                        <span class="company-pill att"><i class="fas fa-globe"></i> AT&amp;T</span>
+                        <span class="company-pill"><i class="fas fa-ellipsis-h" style="color:var(--text-muted)"></i> and others</span>
+                    </div>
+                    <p style="margin-top: 14px;">See our <a href="https://github.com/open-experiments/Telco-AIX/graphs/contributors" target="_blank">contributors in the repo</a>.</p>
                 </div>
 
                 <div class="collab-cta reveal">
