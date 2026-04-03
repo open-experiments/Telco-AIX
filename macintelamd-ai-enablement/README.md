@@ -143,7 +143,3 @@ Verify `libggml-vulkan.dylib` exists in your build directory. If missing, cmake 
 
 If you want maximum performance, the Vega II Duo is based on the **Vega 20 die — the same chip as the AMD Instinct MI60**, which is officially supported by ROCm. Dual-booting RHEL gives you access to PyTorch, vLLM, and text-generation-inference with full ROCm GPU acceleration. That's the nuclear option if Vulkan performance isn't sufficient.
 
-## Contributing
-
-This guide is part of the [Telco-AIX](https://github.com/open-experiments/Telco-AIX) project. PRs welcome — especially if you've tested on other Mac Pro GPU configurations (W5700X, W6800X, etc.).
-
