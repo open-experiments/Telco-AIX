@@ -22,9 +22,9 @@
 #   ./setup-llminfra-macpro.sh [--model MODEL] [--quant QUANT] [--server]
 #
 # Examples:
-#   ./setup-llminfra-macpro.sh
-#   ./setup-llminfra-macpro.sh --model "bartowski/Meta-Llama-3.1-70B-Instruct-GGUF" --quant Q4_K_M
-#   ./setup-llminfra-macpro.sh --server
+#   ./setup-llminfra-macpro.sh                          # Qwen 3.5-35B-A3B interactive chat
+#   ./setup-llminfra-macpro.sh --server                  # OpenAI-compatible API server
+#   ./setup-llminfra-macpro.sh --model "bartowski/Meta-Llama-3.1-8B-Instruct-GGUF" --quant Q4_K_M
 #
 # Author: Fatih E. NAR 
 # Project: https://github.com/open-experiments/Telco-AIX
@@ -37,12 +37,13 @@ set -euo pipefail
 #-------------------------------------------------------------------------------
 LLAMA_CPP_REPO="https://github.com/ggerganov/llama.cpp"
 LLAMA_CPP_DIR="${HOME}/projects/llama.cpp"
-DEFAULT_MODEL="bartowski/Meta-Llama-3.1-8B-Instruct-GGUF"
+DEFAULT_MODEL="bartowski/Qwen_Qwen3.5-35B-A3B-GGUF"
 DEFAULT_QUANT="Q4_K_M"
 SERVER_MODE=false
 NUM_GPU_LAYERS=99
 CONTEXT_SIZE=4096
 SERVER_PORT=8080
+REPEAT_PENALTY=1.1
 
 # Color codes for output
 RED='\033[0;31m'
@@ -66,6 +67,7 @@ while [[ $# -gt 0 ]]; do
         --port)   SERVER_PORT="$2"; shift 2 ;;
         --ctx)    CONTEXT_SIZE="$2"; shift 2 ;;
         --ngl)    NUM_GPU_LAYERS="$2"; shift 2 ;;
+        --repeat-penalty) REPEAT_PENALTY="$2"; shift 2 ;;
         --help|-h)
             echo "Usage: $0 [--model MODEL] [--quant QUANT] [--server] [--dir DIR] [--port PORT] [--ctx SIZE] [--ngl LAYERS]"
             echo ""
@@ -77,6 +79,7 @@ while [[ $# -gt 0 ]]; do
             echo "  --port PORT     Server port (default: ${SERVER_PORT})"
             echo "  --ctx SIZE      Context window size (default: ${CONTEXT_SIZE})"
             echo "  --ngl LAYERS    Number of layers to offload to GPU (default: ${NUM_GPU_LAYERS})"
+            echo "  --repeat-penalty P  Repeat penalty to avoid loops (default: ${REPEAT_PENALTY})"
             exit 0
             ;;
         *) echo -e "${RED}Unknown option: $1${NC}"; exit 1 ;;
@@ -250,9 +253,10 @@ if [[ "${SERVER_MODE}" == true ]]; then
 
     "${LLAMA_CPP_DIR}/build/bin/llama-server" \
         -hf "${HF_MODEL_TAG}" \
-        --chat-template llama3 \
         -ngl "${NUM_GPU_LAYERS}" \
         -c "${CONTEXT_SIZE}" \
+        --repeat-penalty "${REPEAT_PENALTY}" \
+        --no-mmproj \
         --port "${SERVER_PORT}" \
         --host 0.0.0.0
 else
@@ -266,7 +270,7 @@ else
 
     "${LLAMA_CPP_DIR}/build/bin/llama-cli" \
         -hf "${HF_MODEL_TAG}" \
-        --chat-template llama3 \
         -ngl "${NUM_GPU_LAYERS}" \
-        -c "${CONTEXT_SIZE}"
+        -c "${CONTEXT_SIZE}" \
+        --repeat-penalty "${REPEAT_PENALTY}"
 fi

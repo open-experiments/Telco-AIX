@@ -18,6 +18,16 @@ The Mac Pro 7,1 ships with powerful AMD GPUs (up to 2x Vega II Duo = 4 GPU dies,
 
 Build [llama.cpp](https://github.com/ggerganov/llama.cpp) with the **Vulkan backend enabled and Metal disabled**. This routes GPU compute through Vulkan shaders → MoltenVK → AMD GPU hardware, bypassing Metal's broken tensor API for non-Apple-Silicon GPUs.
 
+### GPU Inference in Action
+
+**All 4 Vega II dies active during inference (Activity Monitor):**
+
+![GPU Activity Monitor — all 4 Vega II dies running llama-cli at ~39.5% each](2.png)
+
+**VRAM distribution across 4 Vulkan devices (llama.cpp memory breakdown):**
+
+![llama.cpp memory breakdown across 4 Vulkan devices + Host](3.png)
+
 ## Hardware Tested
 
 | Component | Spec |
@@ -60,24 +70,21 @@ Why `-DGGML_METAL=OFF`? If both backends are compiled, Metal takes priority and 
 
 ### 3. Run Inference
 
-**Interactive chat:**
+**Interactive chat (Qwen 3.5-35B-A3B — recommended):**
 ```bash
 ./build/bin/llama-cli \
-    -hf bartowski/Meta-Llama-3.1-8B-Instruct-GGUF:Q4_K_M \
-    --chat-template llama3 \
-    -ngl 99 \
-    -c 4096
+    -hf bartowski/Qwen_Qwen3.5-35B-A3B-GGUF:Q4_K_M \
+    -ngl 99 -c 4096 \
+    --repeat-penalty 1.1
 ```
 
 **OpenAI-compatible API server:**
 ```bash
 ./build/bin/llama-server \
-    -hf bartowski/Meta-Llama-3.1-8B-Instruct-GGUF:Q4_K_M \
-    --chat-template llama3 \
-    -ngl 99 \
-    -c 4096 \
-    --host 0.0.0.0 \
-    --port 8080
+    -hf bartowski/Qwen_Qwen3.5-35B-A3B-GGUF:Q4_K_M \
+    -ngl 99 -c 4096 \
+    --repeat-penalty 1.1 --no-mmproj \
+    --host 0.0.0.0 --port 8080
 ```
 
 Then call it from any app:
@@ -96,8 +103,11 @@ curl http://localhost:8080/v1/chat/completions \
 |---|---|
 | `-ngl 99` | Offload all model layers to GPU (Vulkan handles distribution across dies) |
 | `-c 4096` | Context window size (increase for longer conversations, costs more VRAM) |
-| `--chat-template llama3` | Apply Llama 3 chat formatting (change per model family) |
+| `--repeat-penalty 1.1` | Prevents repetition loops (recommended for Vulkan backend precision) |
+| `--no-mmproj` | Skip multimodal projection download (server mode — saves bandwidth) |
 | `-hf repo:quant` | Auto-download from HuggingFace with specified quantization |
+
+**Note:** `--chat-template` is omitted intentionally — llama.cpp auto-detects the correct template from GGUF metadata, which works better across different model families (Llama, Qwen, etc.).
 
 ## Model Size Guide
 
@@ -105,10 +115,13 @@ With 32 GB HBM2 VRAM (per Vega II Duo card) + 256 GB system RAM:
 
 | Model | Quant | Size | Fits in VRAM? | Expected Speed |
 |---|---|---|---|---|
+| **Qwen 3.5-35B-A3B (MoE)** | **Q4_K_M** | **~20 GB** | **Yes (full GPU)** | **~37.6 tok/s** |
 | Llama 3.1 8B | Q4_K_M | ~4.9 GB | Yes (full GPU) | ~50 tok/s |
 | Llama 3.1 8B | Q8_0 | ~8.5 GB | Yes (full GPU) | ~35 tok/s |
 | Llama 3.1 70B | Q4_K_M | ~40 GB | Partial (GPU+RAM split) | ~8-12 tok/s |
 | DeepSeek Coder V2 | Q4_K_M | ~8.9 GB | Yes (full GPU) | ~40 tok/s |
+
+**Recommended model:** Qwen 3.5-35B-A3B is a Mixture-of-Experts model (256 experts, 8 active, ~3B active params per token). It delivers excellent quality at 37.6 tok/s while fitting entirely in VRAM across all 4 Vega II dies.
 
 Larger models spill from VRAM into your 256 GB system RAM — slower but still functional.
 
@@ -135,6 +148,12 @@ Metal backend is active instead of Vulkan. Rebuild with `-DGGML_METAL=OFF`.
 
 **Model output is coherent but off-topic**
 Don't use the `-p` flag with interactive chat mode — type your prompt at the `>` prompt instead.
+
+**Model output repeats endlessly**
+Add `--repeat-penalty 1.1` to your command. Vulkan backend floating-point precision on Vega II can cause sampling loops without this penalty.
+
+**Server auto-downloads a large mmproj file**
+Add `--no-mmproj` flag to skip the unnecessary multimodal projection download for text-only inference.
 
 **Slow performance / CPU only**
 Verify `libggml-vulkan.dylib` exists in your build directory. If missing, cmake didn't find Vulkan — check that `vulkan-loader` and `molten-vk` are installed.
