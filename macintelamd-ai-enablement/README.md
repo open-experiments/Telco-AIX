@@ -1,10 +1,10 @@
-# GPU-Accelerated LLM Inference on Mac Pro 7,1 (Intel + AMD Vega II)
+# GPU-Accelerated LLM Inference on Mac with Intel + AMD Vega II hardware
 
-Running local AI inference on the 2019 Mac Pro using its AMD Radeon Pro Vega II Duo GPUs — a setup guide born from real-world trial and error.
+Running local AI inference on the Mac Hardware using its AMD Radeon GPUs — a setup guide born from real-world trial and error.
 
 ## The Problem
 
-The Mac Pro 7,1 ships with powerful AMD GPUs (up to 2x Vega II Duo = 4 GPU dies, 64 GB HBM2 total) that sit completely idle for AI workloads. The typical tools don't work out of the box:
+The Macs used to be shipped with powerful AMD GPUs that sit completely idle for AI workloads. The typical tools don't work out of the box:
 
 | Approach | Status | Why |
 |---|---|---|
