@@ -138,9 +138,9 @@ fi
 # Display model catalog
 #-------------------------------------------------------------------------------
 print_catalog() {
-    echo -e "\n${CYAN}${BOLD}╔══════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}${BOLD}║  Model Catalog — Mac Pro 7,1 Vulkan Inference                              ║${NC}"
-    echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════════════════════════════════════╝${NC}\n"
+    echo -e "\n${CYAN}${BOLD}╔══════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}${BOLD}║  Model Catalog — Mac Vulkan Inference                              ║${NC}"
+    echo -e "${CYAN}${BOLD}╚════════════════════════════════════════════════════════════════════╝${NC}\n"
 
     printf "  ${BOLD}%-4s %-38s %-6s %-12s %-10s${NC}\n" "#" "Model" "Type" "Active" "VRAM Est."
     printf "  %-4s %-38s %-6s %-12s %-10s\n" "----" "--------------------------------------" "------" "------------" "----------"
@@ -236,10 +236,10 @@ fi
 echo ""
 
 if [[ "${SERVER_MODE}" == true ]]; then
-    echo -e "${CYAN}${BOLD}╔══════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}${BOLD}╔═════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}${BOLD}║  Launching OpenAI-Compatible API Server                     ║${NC}"
-    echo -e "${CYAN}${BOLD}║  Endpoint: http://localhost:${SERVER_PORT}/v1                        ║${NC}"
-    echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${CYAN}${BOLD}║  Endpoint: http://localhost:${SERVER_PORT}/v1               ║${NC}"
+    echo -e "${CYAN}${BOLD}╚═════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "${DIM}  Test: curl http://localhost:${SERVER_PORT}/v1/chat/completions \\${NC}"
     echo -e "${DIM}    -H 'Content-Type: application/json' \\${NC}"
@@ -255,11 +255,11 @@ if [[ "${SERVER_MODE}" == true ]]; then
         --port "${SERVER_PORT}" \
         --host 0.0.0.0
 else
-    echo -e "${CYAN}${BOLD}╔══════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}${BOLD}║  Launching Interactive Chat (Vulkan GPU-Accelerated)        ║${NC}"
+    echo -e "${CYAN}${BOLD}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}${BOLD}║  Launching Interactive Chat (Vulkan GPU-Accelerated)       ║${NC}"
     echo -e "${CYAN}${BOLD}║  Type your message at the > prompt                         ║${NC}"
     echo -e "${CYAN}${BOLD}║  Type /exit or Ctrl+C to quit                              ║${NC}"
-    echo -e "${CYAN}${BOLD}╚══════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${CYAN}${BOLD}╚════════════════════════════════════════════════════════════╝${NC}"
     echo ""
 
     exec "${CLI_BIN}" \
