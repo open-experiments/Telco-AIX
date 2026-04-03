@@ -524,6 +524,26 @@
             letter-spacing: 0.05em;
         }
 
+        .badge-new {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--rose-500), var(--warm-500));
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+            vertical-align: middle;
+            animation: pulse-new 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-new {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(244, 63, 94, 0); }
+        }
+
         .exp-card p {
             font-size: 0.9rem;
             color: var(--text-light);
@@ -1498,8 +1518,8 @@
                     <div class="exp-card-head">
                         <div class="exp-icon bg-violet"><i class="fas fa-microchip"></i></div>
                         <div>
-                            <span class="category">Easter Egg</span>
-                            <h3>LLM Inference on Mac Pro via Vulkan</h3>
+                            <span class="category">Easter Egg</span><span class="badge-new">New</span>
+                            <h3>LLM Inference on Intel Mac with AMD GPU via Vulkan</h3>
                         </div>
                     </div>
                     <p>GPU-accelerated LLM inference on Mac Pro 7,1 (2019) with AMD Radeon Pro Vega II Duo GPUs. Bypasses broken Metal tensor API via Vulkan/MoltenVK to unlock 64 GB HBM2 across 4 GPU dies for local AI serving.</p>
