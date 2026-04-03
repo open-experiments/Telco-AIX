@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telco-AIX — AI Experiments for Telecommunications</title>
+    <meta name="description" content="Open-source AI experiments pushing the boundaries of intelligent telecommunications. Explore ML models, agentic frameworks, and datasets for the telecom industry.">
+    <link rel="icon" href="https://raw.githubusercontent.com/tme-osx/Telco-AIX/main/images/logo3.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --warm-50: #FFF8F0;
+            --warm-100: #FFEDD5;
+            --warm-200: #FED7AA;
+            --warm-300: #FDBA74;
+            --warm-400: #FB923C;
+            --warm-500: #F97316;
+            --warm-600: #EA580C;
+            --warm-700: #C2410C;
+            --warm-800: #9A3412;
+            --warm-900: #7C2D12;
+            --amber-400: #FBBF24;
+            --amber-500: #F59E0B;
+            --rose-400: #FB7185;
+            --rose-500: #F43F5E;
+            --coral: #FF6B6B;
+            --peach: #FFECD2;
+            --sand: #FCF5EB;
+            --cream: #FFFBF5;
+            --dark: #1A0F0A;
+            --dark-soft: #2D1F17;
+            --text: #3D2B1F;
+            --text-light: #6B5744;
+            --text-muted: #9A8575;
+            --glass: rgba(255, 255, 255, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.35);
+            --shadow-warm: 0 4px 24px rgba(249, 115, 22, 0.08);
+            --shadow-lg: 0 12px 40px rgba(154, 52, 18, 0.10);
+            --shadow-xl: 0 20px 60px rgba(154, 52, 18, 0.12);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--text);
+            background: var(--cream);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* === ANIMATED BACKGROUND === */
+        .bg-glow {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--cream) 0%, var(--warm-50) 50%, var(--peach) 100%);
+        }
+
+        .bg-glow::before,
+        .bg-glow::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-glow::before {
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--warm-300), transparent 70%);
+            top: -10%; left: -5%;
+        }
+
+        .bg-glow::after {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, var(--amber-400), transparent 70%);
+            bottom: -10%; right: -5%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        /* === NAVIGATION === */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: rgba(255, 251, 245, 0.82);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            box-shadow: 0 2px 20px rgba(154, 52, 18, 0.08);
+        }
+
+        .nav-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .nav-brand img {
+            height: 36px;
+            border-radius: 8px;
+        }
+
+        .nav-brand span {
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 4px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: var(--radius-xs);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--warm-600);
+            background: rgba(249, 115, 22, 0.08);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--warm-500);
+            border-radius: 2px;
+        }
+
+        .nav-github {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: var(--dark);
+            color: #fff;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-github:hover {
+            background: var(--dark-soft);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            color: var(--text);
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* === SECTIONS === */
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* === HERO === */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px 6px 8px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--warm-700);
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-badge .dot {
+            width: 8px; height: 8px;
+            background: var(--warm-500);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 6vw, 4.5rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1.08;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--warm-800) 50%, var(--warm-600) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 640px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--warm-500), var(--warm-600));
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.35);
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: #fff;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-warm);
+        }
+
+        /* === STATS BAR === */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            padding: 40px 0;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--warm-600);
+            letter-spacing: -0.03em;
+        }
+
+        .stat-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 2px;
+        }
+
+        /* === DOMAIN HIGHLIGHTS === */
+        .domains-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 0 0 80px;
+        }
+
+        .domain-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 20px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+        }
+
+        .domain-pill:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-warm);
+            border-color: var(--warm-200);
+        }
+
+        .domain-pill .icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .domain-pill .label {
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text);
+        }
+
+        /* === EXPERIMENT CARDS === */
+        .section-header {
+            text-align: center;
+            padding: 120px 0 50px;
+        }
+
+        .section-header h2 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 12px;
+            color: var(--dark);
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .filter-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            background: var(--glass);
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--warm-300);
+            color: var(--warm-700);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--warm-500), var(--warm-600));
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .experiments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+            padding-bottom: 100px;
+        }
+
+        .exp-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .exp-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--warm-400), var(--amber-400));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .exp-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--warm-200);
+        }
+
+        .exp-card:hover::before {
+            opacity: 1;
+        }
+
+        .exp-card-head {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .exp-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .exp-card-head h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -0.01em;
+        }
+
+        .exp-card-head .category {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--warm-600);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .exp-card p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            line-height: 1.65;
+            flex: 1;
+        }
+
+        .exp-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 16px;
+        }
+
+        .exp-tag {
+            padding: 4px 10px;
+            background: rgba(249, 115, 22, 0.08);
+            color: var(--warm-700);
+            border-radius: 100px;
+            font-size: 0.73rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .exp-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .exp-metric {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .exp-metric strong {
+            color: var(--warm-600);
+            font-weight: 700;
+        }
+
+        .exp-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--warm-600);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .exp-link:hover {
+            color: var(--warm-700);
+            gap: 10px;
+        }
+
+        /* === PUBLICATIONS === */
+        .pub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 20px;
+            padding-bottom: 100px;
+        }
+
+        .pub-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pub-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--warm-200);
+        }
+
+        .pub-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 14px;
+            width: fit-content;
+        }
+
+        .pub-type.article {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--warm-700);
+        }
+
+        .pub-type.video {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--rose-500);
+        }
+
+        .pub-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+            line-height: 1.35;
+        }
+
+        .pub-card .authors {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+            flex: 1;
+        }
+
+        .pub-card .platform {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .pub-card .platform i {
+            color: var(--warm-500);
+        }
+
+        .pub-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--warm-500), var(--warm-600));
+            color: #fff;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.25s ease;
+            width: fit-content;
+        }
+
+        .pub-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.3);
+        }
+
+        /* === HUGGINGFACE === */
+        .hf-section {
+            padding-bottom: 100px;
+        }
+
+        .hf-intro {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hf-intro a {
+            color: var(--warm-600);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .hf-group-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hf-group-title i {
+            color: var(--warm-500);
+        }
+
+        .hf-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+            margin-bottom: 50px;
+        }
+
+        .hf-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .hf-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--warm-200);
+        }
+
+        .hf-card-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .hf-card-head .hf-badge {
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .hf-badge.dataset {
+            background: rgba(251, 191, 36, 0.15);
+            color: #B45309;
+        }
+
+        .hf-badge.model {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--rose-500);
+        }
+
+        .hf-badge.collection {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--warm-700);
+        }
+
+        .hf-card h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--dark);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hf-card p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* === ABOUT / TEAM === */
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        .about-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 40px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 24px;
+        }
+
+        .about-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 14px;
+        }
+
+        .about-card p {
+            color: var(--text-light);
+            line-height: 1.75;
+            font-size: 0.95rem;
+        }
+
+        .about-card a {
+            color: var(--warm-600);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .about-card a:hover {
+            text-decoration: underline;
+        }
+
+        .collab-cta {
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, var(--warm-600), var(--warm-700));
+            border-radius: var(--radius);
+            color: #fff;
+        }
+
+        .collab-cta h3 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .collab-cta p {
+            opacity: 0.9;
+            margin-bottom: 24px;
+            font-size: 1.05rem;
+        }
+
+        .collab-cta .btn {
+            background: #fff;
+            color: var(--warm-700);
+        }
+
+        .collab-cta .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        /* === FOOTER === */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        footer a {
+            color: var(--warm-600);
+            text-decoration: none;
+        }
+
+        /* === SCROLL ANIMATIONS === */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 64px;
+                left: 0; right: 0;
+                background: rgba(255,251,245,0.97);
+                backdrop-filter: blur(20px);
+                padding: 16px;
+                border-bottom: 1px solid var(--glass-border);
+            }
+            .mobile-toggle { display: block; }
+            .nav-github span { display: none; }
+            .experiments-grid,
+            .pub-grid,
+            .hf-grid { grid-template-columns: 1fr; }
+            .stats-bar { gap: 28px; }
+            .hero { padding: 130px 0 60px; }
+            .section-header { padding-top: 100px; }
+            .hero h1 { font-size: 2.2rem; }
+        }
+
+        /* Color utilities for icons */
+        .bg-orange { background: rgba(249,115,22,0.1); color: var(--warm-600); }
+        .bg-amber { background: rgba(245,158,11,0.1); color: #B45309; }
+        .bg-rose { background: rgba(244,63,94,0.1); color: var(--rose-500); }
+        .bg-green { background: rgba(34,197,94,0.1); color: #16A34A; }
+        .bg-blue { background: rgba(59,130,246,0.1); color: #2563EB; }
+        .bg-violet { background: rgba(139,92,246,0.1); color: #7C3AED; }
+        .bg-teal { background: rgba(20,184,166,0.1); color: #0D9488; }
+        .bg-pink { background: rgba(236,72,153,0.1); color: #DB2777; }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+
+    <!-- NAVIGATION -->
+    <nav id="navbar">
+        <div class="nav-inner">
+            <a href="#" class="nav-brand" onclick="switchTab('home')">
+                <img src="https://raw.githubusercontent.com/tme-osx/Telco-AIX/main/images/logo3.png" alt="Telco-AIX">
+                <span>Telco-AIX</span>
+            </a>
+            <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#" class="active" data-tab="home" onclick="switchTab('home')">Home</a></li>
+                <li><a href="#" data-tab="experiments" onclick="switchTab('experiments')">Experiments</a></li>
+                <li><a href="#" data-tab="publications" onclick="switchTab('publications')">Publications</a></li>
+                <li><a href="#" data-tab="huggingface" onclick="switchTab('huggingface')">HuggingFace</a></li>
+                <li><a href="#" data-tab="about" onclick="switchTab('about')">About</a></li>
+            </ul>
+            <a href="https://github.com/open-experiments/Telco-AIX" target="_blank" class="nav-github">
+                <i class="fab fa-github"></i>
+                <span>GitHub</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ======================= HOME ======================= -->
+    <section class="section active" id="home">
+        <div class="container">
+            <div class="hero">
+                <div class="hero-badge">
+                    <span class="dot"></span>
+                    Open-Source &middot; Community Driven
+                </div>
+                <h1>AI Experiments for<br>Telecommunications</h1>
+                <p>A collaborative workspace exploring data-driven decision-making through open-source AI&nbsp;capabilities, open datasets, and cutting-edge ML models &mdash; purpose-built for the telecom&nbsp;industry.</p>
+                <div class="hero-actions">
+                    <a href="#" class="btn btn-primary" onclick="switchTab('experiments')">
+                        <i class="fas fa-flask"></i> Explore Experiments
+                    </a>
+                    <a href="https://github.com/open-experiments/Telco-AIX" target="_blank" class="btn btn-secondary">
+                        <i class="fab fa-github"></i> View on GitHub
+                    </a>
+                </div>
+                <div class="stats-bar">
+                    <div class="stat">
+                        <div class="stat-num">20+</div>
+                        <div class="stat-label">Experiments</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num">6</div>
+                        <div class="stat-label">Open Datasets</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num">14</div>
+                        <div class="stat-label">Publications</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num">10+</div>
+                        <div class="stat-label">AI Domains</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="domains-grid">
+                <div class="domain-pill reveal">
+                    <div class="icon bg-orange"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="label">Revenue Assurance</div>
+                </div>
+                <div class="domain-pill reveal">
+                    <div class="icon bg-blue"><i class="fas fa-tower-cell"></i></div>
+                    <div class="label">5G Network Ops</div>
+                </div>
+                <div class="domain-pill reveal">
+                    <div class="icon bg-rose"><i class="fas fa-robot"></i></div>
+                    <div class="label">Agentic AI</div>
+                </div>
+                <div class="domain-pill reveal">
+                    <div class="icon bg-green"><i class="fas fa-leaf"></i></div>
+                    <div class="label">Sustainability</div>
+                </div>
+                <div class="domain-pill reveal">
+                    <div class="icon bg-violet"><i class="fas fa-shield-halved"></i></div>
+                    <div class="label">Security</div>
+                </div>
+                <div class="domain-pill reveal">
+                    <div class="icon bg-amber"><i class="fas fa-chart-line"></i></div>
+                    <div class="label">Service Quality</div>
+                </div>
+                <div class="domain-pill reveal">
+                    <div class="icon bg-teal"><i class="fas fa-bolt"></i></div>
+                    <div class="label">Smart Grid</div>
+                </div>
+                <div class="domain-pill reveal">
+                    <div class="icon bg-pink"><i class="fas fa-headset"></i></div>
+                    <div class="label">Customer Experience</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= EXPERIMENTS ======================= -->
+    <section class="section" id="experiments">
+        <div class="container">
+            <div class="section-header">
+                <h2>Experiments</h2>
+                <p>Each experiment tackles a real telecom challenge with purpose-built AI models, open data, and reproducible pipelines.</p>
+            </div>
+
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all" onclick="filterExps('all', this)">All</button>
+                <button class="filter-btn" data-filter="network" onclick="filterExps('network', this)">Network Ops</button>
+                <button class="filter-btn" data-filter="agentic" onclick="filterExps('agentic', this)">Agentic AI</button>
+                <button class="filter-btn" data-filter="revenue" onclick="filterExps('revenue', this)">Revenue &amp; CX</button>
+                <button class="filter-btn" data-filter="security" onclick="filterExps('security', this)">Security</button>
+                <button class="filter-btn" data-filter="sustainability" onclick="filterExps('sustainability', this)">Sustainability</button>
+                <button class="filter-btn" data-filter="llm" onclick="filterExps('llm', this)">LLM / GenAI</button>
+            </div>
+
+            <div class="experiments-grid" id="expGrid">
+
+                <!-- Agentic Framework -->
+                <div class="exp-card reveal" data-cat="agentic">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-rose"><i class="fas fa-robot"></i></div>
+                        <div>
+                            <span class="category">Agentic AI</span>
+                            <h3>Agentic Telco Framework</h3>
+                        </div>
+                    </div>
+                    <p>Cloud-native framework for autonomous network management through cooperating AI agents. Implements detection, diagnosis, planning, and resolution without human intervention using custom MCP/ACP protocols.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">FastAPI</span>
+                        <span class="exp-tag">WebSocket</span>
+                        <span class="exp-tag">MCP</span>
+                        <span class="exp-tag">ACP</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>4</strong> Agent Types</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/agentic" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- AutoNet -->
+                <div class="exp-card reveal" data-cat="agentic">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-rose"><i class="fas fa-network-wired"></i></div>
+                        <div>
+                            <span class="category">Agentic AI</span>
+                            <h3>Autonomous 5G Network</h3>
+                        </div>
+                    </div>
+                    <p>Distributed AI agents with real-time anomaly detection and autonomous remediation for 5G core (AMF, SMF, UPF). Features genuine agent-to-agent communication, Ansible integration, and timeline replay up to 100x speed.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">ACP/MCP</span>
+                        <span class="exp-tag">Ansible</span>
+                        <span class="exp-tag">Multi-LLM</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>1x–100x</strong> Replay Speed</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/autonet" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- 5G NetOps -->
+                <div class="exp-card reveal" data-cat="network">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-blue"><i class="fas fa-tower-cell"></i></div>
+                        <div>
+                            <span class="category">Network Ops</span>
+                            <h3>5G Network Operations</h3>
+                        </div>
+                    </div>
+                    <p>Predicts fault occurrence rates in 5G radio networks by fine-tuning Google T5 models on telecom KPIs correlated with FCC complaints and weather data. Enables proactive fault detection before service impact.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">T5 Fine-Tuning</span>
+                        <span class="exp-tag">Flask</span>
+                        <span class="exp-tag">Multi-GPU</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">FCC + Weather data</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/5gnetops" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- 5G Prod / NOC -->
+                <div class="exp-card reveal" data-cat="network llm">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-blue"><i class="fas fa-desktop"></i></div>
+                        <div>
+                            <span class="category">Network Ops</span>
+                            <h3>NOC AI Augmentation</h3>
+                        </div>
+                    </div>
+                    <p>AI-augmented Network Operation Center combining Isolation Forest anomaly detection with LangChain/FAISS vector search and GenAI for multi-source data analysis in 5G core networks. Interactive Dash dashboard.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">LangChain</span>
+                        <span class="exp-tag">FAISS</span>
+                        <span class="exp-tag">Dash</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">ML + GenAI Pipeline</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/5gprod" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- RAFM -->
+                <div class="exp-card reveal" data-cat="revenue">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-orange"><i class="fas fa-dollar-sign"></i></div>
+                        <div>
+                            <span class="category">Revenue Management</span>
+                            <h3>Revenue Assurance &amp; Fraud</h3>
+                        </div>
+                    </div>
+                    <p>Balanced Random Forest and Transformer models for predicting fraudulent telecom transactions and identifying revenue anomalies. Trained on synthetic billing data with call duration, roaming, and usage features.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Random Forest</span>
+                        <span class="exp-tag">Transformers</span>
+                        <span class="exp-tag">ONNX</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>99.96%</strong> Test Accuracy</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/revenueassurance" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Service Assurance -->
+                <div class="exp-card reveal" data-cat="revenue">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-amber"><i class="fas fa-chart-line"></i></div>
+                        <div>
+                            <span class="category">Service Quality</span>
+                            <h3>Service Assurance NPS</h3>
+                        </div>
+                    </div>
+                    <p>Predicts Net Promoter Score from telecom performance metrics using a 175K-parameter Transformer with multi-head attention. Correlates real FCC complaint data and weather conditions with network metrics.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Transformer</span>
+                        <span class="exp-tag">NPS</span>
+                        <span class="exp-tag">MAPE</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>175K</strong> Parameters</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/serviceassurance" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Churn -->
+                <div class="exp-card reveal" data-cat="revenue">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-orange"><i class="fas fa-user-minus"></i></div>
+                        <div>
+                            <span class="category">Customer Experience</span>
+                            <h3>Churn Prediction</h3>
+                        </div>
+                    </div>
+                    <p>End-to-end customer churn prediction using Balanced Random Forest and LightGBM. Identifies high-risk customers to enable targeted retention, with Docker-ready deployment and Flask serving.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">LightGBM</span>
+                        <span class="exp-tag">Random Forest</span>
+                        <span class="exp-tag">Docker</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>75.4%</strong> Accuracy</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/churn" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- CRM -->
+                <div class="exp-card reveal" data-cat="revenue llm">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-pink"><i class="fas fa-headset"></i></div>
+                        <div>
+                            <span class="category">Customer Experience</span>
+                            <h3>CRM VoiceBot</h3>
+                        </div>
+                    </div>
+                    <p>AI-powered conversational VoiceBot for telecom customer relationship management. Integrates with Model-as-a-Service platforms for GenAI interaction with OpenShift deployment support.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Flask</span>
+                        <span class="exp-tag">GenAI</span>
+                        <span class="exp-tag">OpenShift</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">Voice + Text UI</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/crm" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Intent Classification -->
+                <div class="exp-card reveal" data-cat="revenue llm">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-pink"><i class="fas fa-language"></i></div>
+                        <div>
+                            <span class="category">Customer Experience</span>
+                            <h3>Intent Classification</h3>
+                        </div>
+                    </div>
+                    <p>Unified telco customer intent classification achieving 93.95% accuracy for English and 81.44% for Arabic. Fine-tuned Qwen3-4B with 70+ intent categories, replacing fragmented NLP pipelines.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Qwen3-4B</span>
+                        <span class="exp-tag">SFT</span>
+                        <span class="exp-tag">vLLM</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>93.95%</strong> English Accuracy</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/intclass" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- LLM RCA -->
+                <div class="exp-card reveal" data-cat="network llm">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-violet"><i class="fas fa-magnifying-glass-chart"></i></div>
+                        <div>
+                            <span class="category">Advanced AI</span>
+                            <h3>LLM Root Cause Analysis</h3>
+                        </div>
+                    </div>
+                    <p>Multi-source 5G root cause analysis combining Isolation Forest anomaly detection with VectorDB log association and GenAI for explainable diagnostics. Chains classical ML with LLM reasoning.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Isolation Forest</span>
+                        <span class="exp-tag">VectorDB</span>
+                        <span class="exp-tag">RAG</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">ML → GenAI Chain</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/llm-rca" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Telco SME -->
+                <div class="exp-card reveal" data-cat="llm">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-violet"><i class="fas fa-graduation-cap"></i></div>
+                        <div>
+                            <span class="category">LLM / GenAI</span>
+                            <h3>Telco Expert Portal</h3>
+                        </div>
+                    </div>
+                    <p>Subject Matter Expert portal with 7+ specialized system prompts (Network, Telco, Cloud, Storage experts), file analysis support, persistent sessions, and real-time vLLM metrics visualization.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Gradio</span>
+                        <span class="exp-tag">vLLM</span>
+                        <span class="exp-tag">Embeddings</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>7+</strong> Expert Personas</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/telco-sme" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- ITSM -->
+                <div class="exp-card reveal" data-cat="llm">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-violet"><i class="fas fa-ticket"></i></div>
+                        <div>
+                            <span class="category">IT Management</span>
+                            <h3>ITSM AI Automation</h3>
+                        </div>
+                    </div>
+                    <p>Integrated IT Service Management combining ServiceNow, Ansible Automation Platform, and OpenShift AI. Automatic incident classification with OpenVINO and automated remediation playbooks.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">ServiceNow</span>
+                        <span class="exp-tag">Ansible</span>
+                        <span class="exp-tag">OpenVINO</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">End-to-End Automation</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/itsm-ai-automation" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- AI-RAN Energy -->
+                <div class="exp-card reveal" data-cat="sustainability network">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-green"><i class="fas fa-battery-full"></i></div>
+                        <div>
+                            <span class="category">AI-RAN</span>
+                            <h3>RAN Energy Efficiency</h3>
+                        </div>
+                    </div>
+                    <p>JAX-based neural networks and Deep Reinforcement Learning for energy-efficient 5G RAN. Achieves 30–35% energy savings through intelligent cell sleep scheduling with sub-5ms inference latency.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">JAX/Flax</span>
+                        <span class="exp-tag">DQN</span>
+                        <span class="exp-tag">TCN</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>30–35%</strong> Energy Savings</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/airan-energy" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- AI-RAN PUSCH -->
+                <div class="exp-card reveal" data-cat="network">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-blue"><i class="fas fa-satellite-dish"></i></div>
+                        <div>
+                            <span class="category">AI-RAN</span>
+                            <h3>PUSCH Neural Receiver</h3>
+                        </div>
+                    </div>
+                    <p>Neural receiver for 5G PUSCH replacing conventional channel estimation with end-to-end deep learning. ResNet + Multi-Head Attention architecture achieving 2–3 dB SNR gain with TensorRT FP16 optimization.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">NVIDIA Sionna</span>
+                        <span class="exp-tag">TensorRT</span>
+                        <span class="exp-tag">3GPP</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>2–3 dB</strong> SNR Gain</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/airan-pusch-receiver" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- SecOps -->
+                <div class="exp-card reveal" data-cat="security">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-teal"><i class="fas fa-shield-halved"></i></div>
+                        <div>
+                            <span class="category">Security</span>
+                            <h3>SecOps AI</h3>
+                        </div>
+                    </div>
+                    <p>Network security operations using XGBRegressor for anomaly detection and security metrics prediction. Identifies and prevents threats in telecom networks through latency and behavior analysis.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">XGBoost</span>
+                        <span class="exp-tag">Anomaly Detection</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">MAPE Evaluation</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/secops" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- IoT Security -->
+                <div class="exp-card reveal" data-cat="security">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-teal"><i class="fas fa-microchip"></i></div>
+                        <div>
+                            <span class="category">Security</span>
+                            <h3>IoT Perimeter Security</h3>
+                        </div>
+                    </div>
+                    <p>ML-based perimeter security for telecom base stations using low-cost IoT sensors (ALS, PIR, temperature/humidity) instead of expensive camera systems. Detects unauthorized access in C-RAN deployments.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">IoT Sensors</span>
+                        <span class="exp-tag">Anomaly Detection</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">Low-Cost Alternative</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/iot-sec" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Sustainability -->
+                <div class="exp-card reveal" data-cat="sustainability">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-green"><i class="fas fa-leaf"></i></div>
+                        <div>
+                            <span class="category">Sustainability</span>
+                            <h3>Energy Efficiency</h3>
+                        </div>
+                    </div>
+                    <p>Predicts energy efficiency in telco network infrastructure using linear regression models. Targets green telecom initiatives and power consumption optimization across network elements.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Linear Regression</span>
+                        <span class="exp-tag">Green Telecom</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">Power Optimization</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/sustainability" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- SmartGrid -->
+                <div class="exp-card reveal" data-cat="sustainability">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-teal"><i class="fas fa-bolt"></i></div>
+                        <div>
+                            <span class="category">Smart Infrastructure</span>
+                            <h3>AI-Powered SmartGrid</h3>
+                        </div>
+                    </div>
+                    <p>Anomaly detection for power consumption in electrical grids, using UCI household power dataset. Balances power use versus predicted demand for forecasting and proactive grid management.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Anomaly Detection</span>
+                        <span class="exp-tag">UCI Dataset</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">Demand Forecasting</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/smartgrid" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Starlink -->
+                <div class="exp-card reveal" data-cat="network">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-blue"><i class="fas fa-satellite"></i></div>
+                        <div>
+                            <span class="category">Connectivity</span>
+                            <h3>Starlink QoE Prediction</h3>
+                        </div>
+                    </div>
+                    <p>Quality of Experience prediction for Starlink using Transformer neural networks. Analyzes altitude, visible satellites, weather, and obstructions to help nomadic users anticipate connectivity quality.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Transformer</span>
+                        <span class="exp-tag">Flask</span>
+                        <span class="exp-tag">HuggingFace</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric">Geo-Aware QoE</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/starlink" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- DeepSeek -->
+                <div class="exp-card reveal" data-cat="llm">
+                    <div class="exp-card-head">
+                        <div class="exp-icon bg-violet"><i class="fas fa-server"></i></div>
+                        <div>
+                            <span class="category">Easter Egg</span>
+                            <h3>DeepSeek on K8s</h3>
+                        </div>
+                    </div>
+                    <p>Deploy DeepSeek models locally on a single Kubernetes node using Ollama and OpenWebUI. Supports model variants from 1.1GB to 404GB on OpenShift with dual NVIDIA RTX 4090 GPUs.</p>
+                    <div class="exp-tags">
+                        <span class="exp-tag">Ollama</span>
+                        <span class="exp-tag">OpenShift</span>
+                        <span class="exp-tag">RTX 4090</span>
+                    </div>
+                    <div class="exp-footer">
+                        <span class="exp-metric"><strong>1.1–404 GB</strong> Models</span>
+                        <a href="https://github.com/open-experiments/Telco-AIX/tree/main/etc/deepseek" target="_blank" class="exp-link">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= PUBLICATIONS ======================= -->
+    <section class="section" id="publications">
+        <div class="container">
+            <div class="section-header">
+                <h2>Publications</h2>
+                <p>Articles, talks, and interviews from the team exploring AI applications in telecommunications.</p>
+            </div>
+
+            <div class="pub-grid">
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>The AI Engine Is Ready — But Where's the Rest?</h3>
+                    <p class="authors">Tushar Katarki, Fatih E. Nar, William Caban</p>
+                    <div class="platform"><i class="fab fa-medium"></i> Medium &middot; Open 5G Hypercore</div>
+                    <a href="https://medium.com/open-5g-hypercore/episode-xxviii-the-ai-engine-is-ready-but-wheres-the-rest-05b7d3d25fd0" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>Lessons Learned from a Telco MCP Backend Experiments</h3>
+                    <p class="authors">Ian Hood, Robert Shaw, Fatih E. Nar</p>
+                    <div class="platform"><i class="fab fa-medium"></i> Medium &middot; Open 5G Hypercore</div>
+                    <a href="https://medium.com/open-5g-hypercore/episode-xxvii-lessons-learned-from-a-telco-mcp-backend-experiments-bf14d90b1e6a" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>Satisfaction is All You Need!</h3>
+                    <p class="authors">Fatih E. Nar, Ian Hood, Ranny Haiby et al.</p>
+                    <div class="platform"><i class="fab fa-medium"></i> Medium &middot; Open 5G Hypercore</div>
+                    <a href="https://medium.com/open-5g-hypercore/episode-xxv-satisfaction-is-all-you-need-9ff145d68385" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>Artificially Intelligent Platform Interface (AI-PI)</h3>
+                    <p class="authors">Fatih E. Nar, Ian Hood, Shujaur Mufti et al.</p>
+                    <div class="platform"><i class="fab fa-medium"></i> Medium &middot; Open 5G Hypercore</div>
+                    <a href="https://medium.com/open-5g-hypercore/episode-xxiv-artificially-intelligent-platform-interface-667f44dcecf1" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>TrueAI4Telco</h3>
+                    <p class="authors">Azhar Sayeed, Fatih E. Nar et al.</p>
+                    <div class="platform"><i class="fab fa-medium"></i> Medium &middot; Open 5G Hypercore</div>
+                    <a href="https://medium.com/open-5g-hypercore/episode-xxiii-trueai4telco-3e372898ce06" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>AI Accelerators: Performance vs Sustainability</h3>
+                    <p class="authors">Fatih E. Nar</p>
+                    <div class="platform"><i class="fab fa-medium"></i> Medium &middot; Open 5G Hypercore</div>
+                    <a href="https://medium.com/open-5g-hypercore/episode-xxii-ai-accelerators-performance-vs-sustainability-256244f83b1b" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>Avoid AI Blindness for Business Vision</h3>
+                    <p class="authors">Arun Thomas, Fatih E. Nar</p>
+                    <div class="platform"><i class="fab fa-medium"></i> Medium &middot; Open 5G Hypercore</div>
+                    <a href="https://medium.com/open-5g-hypercore/episode-xxi-avoid-ai-blindness-for-business-vision-and-see-the-rainbow-954eaa0dfa80" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type video"><i class="fas fa-video"></i> Video</span>
+                    <h3>AI for Network Scalability</h3>
+                    <p class="authors">Fatih E. Nar</p>
+                    <div class="platform"><i class="fab fa-youtube"></i> YouTube Interview</div>
+                    <a href="https://www.youtube.com/watch?v=-gZ2xWLAw68" target="_blank" class="pub-link">Watch <i class="fas fa-play"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type video"><i class="fas fa-video"></i> Video</span>
+                    <h3>Integrating Gen AI in Networks</h3>
+                    <p class="authors">Fatih E. Nar</p>
+                    <div class="platform"><i class="fas fa-film"></i> Vimeo Panel</div>
+                    <a href="https://vimeo.com/948208742" target="_blank" class="pub-link">Watch <i class="fas fa-play"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>GenAI: A Game Changer for Telcos</h3>
+                    <p class="authors">Vinodhkumar Raghunathan, Fatih E. Nar</p>
+                    <div class="platform"><i class="fas fa-globe"></i> Fierce Network</div>
+                    <a href="https://www.fierce-network.com/sponsored/genai-game-changer-telcos" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>How to Train a BERT ML Model on OpenShift AI</h3>
+                    <p class="authors">Alessandro Arrichiello</p>
+                    <div class="platform"><i class="fab fa-redhat"></i> Red Hat Developers</div>
+                    <a href="https://developers.redhat.com/blog/2024/07/23/how-train-bert-machine-learning-model-openshift-ai" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="pub-card reveal">
+                    <span class="pub-type article"><i class="fas fa-newspaper"></i> Article</span>
+                    <h3>Transforming ITSM with Ansible Automation</h3>
+                    <p class="authors">Alessandro Arrichiello</p>
+                    <div class="platform"><i class="fab fa-redhat"></i> Red Hat Developers</div>
+                    <a href="https://developers.redhat.com/blog/2024/09/18/transforming-itsm-ansible-automation-gradual-approach" target="_blank" class="pub-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= HUGGINGFACE ======================= -->
+    <section class="section" id="huggingface">
+        <div class="container">
+            <div class="section-header">
+                <h2><i class="fas fa-face-smile-wink" style="color:var(--amber-500)"></i> HuggingFace Collection</h2>
+                <p>Open datasets and trained models ready for experimentation, fine-tuning, and deployment.</p>
+            </div>
+
+            <div class="hf-section">
+                <div class="hf-intro">
+                    <a href="https://huggingface.co/collections/fenar/telco-aix-66737384ab5687fe3d9a4b94" target="_blank" class="btn btn-primary" style="margin-bottom: 40px;">
+                        <i class="fas fa-external-link-alt"></i> View Full Collection on HuggingFace
+                    </a>
+                </div>
+
+                <h3 class="hf-group-title"><i class="fas fa-database"></i> Datasets</h3>
+                <div class="hf-grid">
+                    <a href="https://huggingface.co/datasets/fenar/service_assurance" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge dataset">Dataset</span>
+                        </div>
+                        <h4>fenar/service_assurance</h4>
+                        <p>Service assurance dataset with ~650K rows of telecom performance metrics, NPS scores, and correlated FCC/weather data.</p>
+                    </a>
+
+                    <a href="https://huggingface.co/datasets/fenar/revenue_assurance" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge dataset">Dataset</span>
+                        </div>
+                        <h4>fenar/revenue_assurance</h4>
+                        <p>Revenue assurance dataset with ~1M rows of telecom transaction records including billing patterns, usage, and fraud labels.</p>
+                    </a>
+
+                    <a href="https://huggingface.co/datasets/fenar/5g_netops" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge dataset">Dataset</span>
+                        </div>
+                        <h4>fenar/5g_netops</h4>
+                        <p>5G network operations dataset with ~100K rows of radio network KPIs and fault occurrence records.</p>
+                    </a>
+
+                    <a href="https://huggingface.co/datasets/fenar/sec_ops" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge dataset">Dataset</span>
+                        </div>
+                        <h4>fenar/sec_ops</h4>
+                        <p>Security operations dataset with ~100K rows of network security events, latency metrics, and anomaly indicators.</p>
+                    </a>
+
+                    <a href="https://huggingface.co/datasets/fenar/iot-security" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge dataset">Dataset</span>
+                        </div>
+                        <h4>fenar/iot-security</h4>
+                        <p>IoT perimeter security dataset with ~134K rows of sensor readings (ALS, PIR, temperature, humidity) from base stations.</p>
+                    </a>
+
+                    <a href="https://huggingface.co/datasets/alezzandro/itsm_tickets" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge dataset">Dataset</span>
+                        </div>
+                        <h4>alezzandro/itsm_tickets</h4>
+                        <p>IT Service Management tickets dataset with ~1K categorized incident records for classification training.</p>
+                    </a>
+                </div>
+
+                <h3 class="hf-group-title"><i class="fas fa-brain"></i> Models</h3>
+                <div class="hf-grid">
+                    <a href="https://huggingface.co/alezzandro/itsm_tickets" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge model">Model</span>
+                        </div>
+                        <h4>alezzandro/itsm_tickets</h4>
+                        <p>Text classification model (~67M parameters) for automatic ITSM ticket categorization and routing.</p>
+                    </a>
+                </div>
+
+                <h3 class="hf-group-title"><i class="fas fa-layer-group"></i> Sub-Collections</h3>
+                <div class="hf-grid">
+                    <a href="https://huggingface.co/collections/fenar/revenue-assurance" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge collection">Collection</span>
+                        </div>
+                        <h4>fenar/revenue-assurance</h4>
+                        <p>Revenue assurance models and datasets sub-collection (2 items).</p>
+                    </a>
+
+                    <a href="https://huggingface.co/collections/fenar/sustainability" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge collection">Collection</span>
+                        </div>
+                        <h4>fenar/sustainability</h4>
+                        <p>Sustainability and energy efficiency sub-collection (2 items).</p>
+                    </a>
+
+                    <a href="https://huggingface.co/collections/fenar/secops" target="_blank" class="hf-card reveal">
+                        <div class="hf-card-head">
+                            <span class="hf-badge collection">Collection</span>
+                        </div>
+                        <h4>fenar/secops</h4>
+                        <p>Security operations models and datasets sub-collection (3 items).</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================= ABOUT ======================= -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2>About Telco-AIX</h2>
+                <p>An open, collaborative workspace for the future of intelligent networking.</p>
+            </div>
+
+            <div class="about-content">
+                <div class="about-card reveal">
+                    <h3>Our Mission</h3>
+                    <p>Telco-AIX is a collaborative experimental workspace where we explore data-driven decision-making through open-source AI capabilities and open datasets. Every experiment is designed to tackle real-world telecom challenges — from predicting customer churn to autonomously managing 5G networks — with reproducible code, open data, and transparent methodology.</p>
+                </div>
+
+                <div class="about-card reveal">
+                    <h3>How It Works</h3>
+                    <p>Each experiment is self-contained with its own dependencies, data pipelines, and deployment patterns. We use a broad range of AI techniques — classical ML (Random Forests, XGBoost), deep learning (Transformers, DQN), LLM-powered RAG pipelines, and multi-agent frameworks with custom protocols (MCP/ACP). Models and datasets are published openly on <a href="https://huggingface.co/collections/fenar/telco-aix-66737384ab5687fe3d9a4b94" target="_blank">HuggingFace</a> for the community to build upon.</p>
+                </div>
+
+                <div class="about-card reveal">
+                    <h3>Key Contributors</h3>
+                    <p>Fatih E. Nar, Ian Hood, Tushar Katarki, William Caban, Robert Shaw, Ranny Haiby, Shujaur Mufti, Azhar Sayeed, Arun Thomas, Vinodhkumar Raghunathan, Alessandro Arrichiello, and a growing community of telecom AI enthusiasts.</p>
+                </div>
+
+                <div class="collab-cta reveal">
+                    <h3>Join the AI Revolution in Telecom</h3>
+                    <p>Interested in cutting-edge AI applications for telecom? Let's collaborate.</p>
+                    <a href="https://www.linkedin.com/in/fenar/" target="_blank" class="btn">
+                        <i class="fab fa-linkedin"></i> Connect on LinkedIn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024–2026 Telco-AIX Contributors &middot; <a href="https://github.com/open-experiments/Telco-AIX" target="_blank">GitHub</a> &middot; <a href="https://huggingface.co/collections/fenar/telco-aix-66737384ab5687fe3d9a4b94" target="_blank">HuggingFace</a> &middot; Licensed under Apache 2.0</p>
+        </div>
+    </footer>
+
+    <script>
+        // === TAB NAVIGATION ===
+        function switchTab(tab) {
+            // Update sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+
+            // Update nav links
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`.nav-links a[data-tab="${tab}"]`).classList.add('active');
+
+            // Close mobile menu
+            document.getElementById('navLinks').classList.remove('open');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Trigger reveal animations for new section
+            setTimeout(() => triggerReveal(), 100);
+        }
+
+        // === MOBILE MENU ===
+        function toggleMobile() {
+            document.getElementById('navLinks').classList.toggle('open');
+        }
+
+        // === EXPERIMENT FILTER ===
+        function filterExps(cat, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.querySelectorAll('.exp-card').forEach(card => {
+                if (cat === 'all') {
+                    card.style.display = 'flex';
+                } else {
+                    const cats = card.dataset.cat.split(' ');
+                    card.style.display = cats.includes(cat) ? 'flex' : 'none';
+                }
+            });
+        }
+
+        // === SCROLL REVEAL ===
+        function triggerReveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach((el, i) => {
+                const rect = el.getBoundingClientRect();
+                const visible = rect.top < window.innerHeight - 60;
+                if (visible) {
+                    setTimeout(() => el.classList.add('visible'), i * 40);
+                }
+            });
+        }
+
+        window.addEventListener('scroll', triggerReveal);
+        window.addEventListener('load', triggerReveal);
+
+        // === NAV SHADOW ON SCROLL ===
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+        });
+    </script>
+</body>
+</html>
