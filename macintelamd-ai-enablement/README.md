@@ -22,7 +22,7 @@ Build [llama.cpp](https://github.com/ggerganov/llama.cpp) with the **Vulkan back
 
 **All 4 Vega II dies active during inference (Activity Monitor):**
 
-![GPU Activity Monitor — all 4 Vega II dies running llama-cli at ~39.5% each](2.png)
+![GPU Activity Monitor — all 4 Vega II dies running llama-cli at ~39.5% each](21.png)
 
 **VRAM distribution across 4 Vulkan devices (llama.cpp memory breakdown):**
 
