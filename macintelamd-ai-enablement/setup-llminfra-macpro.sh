@@ -256,8 +256,8 @@ if [[ "${SERVER_MODE}" == true ]]; then
         -c "${CONTEXT_SIZE}" \
         --repeat-penalty "${REPEAT_PENALTY}" \
         --no-mmproj \
-        --jinja \
-        --reasoning-format deepseek \
+        --chat-template chatml \
+        --reasoning-format none \
         --port "${SERVER_PORT}" \
         --host 0.0.0.0
 else
