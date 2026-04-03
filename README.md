@@ -29,6 +29,7 @@ Welcome to the **Telco-AIX** collaborative experimental workspace –> where we 
 
 ## 🥚 Easter Egg
 
+- [Run Local AI on Your Old Intel MAC with AMD GPU Acceleration](https://github.com/open-experiments/Telco-AIX/tree/main/macintelamd-ai-enablement)
 - [Run DeepSeek Locally on Single K8s Node](https://github.com/tme-osx/Telco-AIX/tree/main/etc/deepseek)
 
 ## DataSets & Trained Models Collection
