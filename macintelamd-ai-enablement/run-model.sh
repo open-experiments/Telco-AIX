@@ -310,6 +310,7 @@ if [[ "${SERVER_MODE}" == true ]]; then
         -c "${CONTEXT_SIZE}" \
         --repeat-penalty "${REPEAT_PENALTY}" \
         --no-mmproj \
+        --reasoning-format deepseek \
         --port "${SERVER_PORT}" \
         --host 0.0.0.0
 else
