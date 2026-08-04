@@ -1,6 +1,0 @@
-# Gitleaks false positives (fingerprints: <commit>:<file>:<rule>:<line> or <file>:<rule>:<line>)
-# T5Tokenizer import line matches the generic-api-key heuristic; it is not a secret.
-5gnetops/5gran-modelserver.py:generic-api-key:4
-601a7357569c55db83e26c0d52641b97fd9a34ce:5gnetops/5gran-modelserver.py:generic-api-key:4
-49645e7a645a98cb2099c6d750b23bf3815adfeb:5gnetops/5gran-modelserver.py:generic-api-key:4
-d4d2d6fb0cc53112327b3c6d774c729a7a7458a5:5gnetops/5gran-modelserver.py:generic-api-key:4
