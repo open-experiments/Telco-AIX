@@ -55,19 +55,18 @@ import tempfile
 def _validate_upload_path(path: str) -> str:
     """Safely resolve a Gradio-supplied upload path.
 
-    Ensures the path refers to a real file inside an allowed upload/temp
-    directory, preventing user-controlled path traversal (CodeQL py/path-injection).
+    Normalizes the path and verifies it stays inside the allowed upload/temp
+    root BEFORE any filesystem access, preventing user-controlled path
+    traversal (CodeQL py/path-injection).
     """
-    allowed_roots = [
-        os.path.realpath(os.environ.get('GRADIO_TEMP_DIR',
-                                        os.path.join(tempfile.gettempdir(), 'gradio'))),
-        os.path.realpath(tempfile.gettempdir()),
-    ]
+    upload_root = os.path.realpath(
+        os.environ.get('GRADIO_TEMP_DIR', tempfile.gettempdir()))
     real = os.path.realpath(str(path))
+    # Containment check first: no filesystem access until the path is proven safe
+    if not real.startswith(upload_root + os.sep):
+        raise ValueError("Uploaded file outside allowed upload directory")
     if not os.path.isfile(real):
         raise ValueError("Uploaded file not found")
-    if not any(real == root or real.startswith(root + os.sep) for root in allowed_roots):
-        raise ValueError("Uploaded file outside allowed upload directory")
     return real
 
 # Configuration
@@ -1710,14 +1709,15 @@ class MetricsCollector:
         Strips any directory components and verifies the resolved path stays
         within the archive directory (prevents path traversal / injection).
         """
-        safe_name = Path(filename).name  # drop any directory components
+        safe_name = os.path.basename(str(filename))  # drop any directory components
         if not safe_name or safe_name in ('.', '..'):
             raise ValueError(f"Invalid filename: {filename!r}")
-        candidate = (self.archive_dir / safe_name).resolve()
-        base = self.archive_dir.resolve()
-        if not str(candidate).startswith(str(base) + os.sep):
+        base = os.path.realpath(str(self.archive_dir))
+        candidate = os.path.realpath(os.path.join(base, safe_name))
+        # Containment check before any filesystem access on the candidate path
+        if not candidate.startswith(base + os.sep):
             raise ValueError(f"Filename escapes archive directory: {filename!r}")
-        return candidate
+        return Path(candidate)
 
     def export_metrics(self, filename: str = None) -> str:
         """Export metrics data to a file"""

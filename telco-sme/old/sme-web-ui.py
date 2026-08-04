@@ -1646,14 +1646,15 @@ class MetricsCollector:
         Strips any directory components and verifies the resolved path stays
         within the archive directory (prevents path traversal / injection).
         """
-        safe_name = Path(filename).name  # drop any directory components
+        safe_name = os.path.basename(str(filename))  # drop any directory components
         if not safe_name or safe_name in ('.', '..'):
             raise ValueError(f"Invalid filename: {filename!r}")
-        candidate = (self.archive_dir / safe_name).resolve()
-        base = self.archive_dir.resolve()
-        if not str(candidate).startswith(str(base) + os.sep):
+        base = os.path.realpath(str(self.archive_dir))
+        candidate = os.path.realpath(os.path.join(base, safe_name))
+        # Containment check before any filesystem access on the candidate path
+        if not candidate.startswith(base + os.sep):
             raise ValueError(f"Filename escapes archive directory: {filename!r}")
-        return candidate
+        return Path(candidate)
 
     def export_metrics(self, filename: str = None) -> str:
         """Export metrics data to a file"""
