@@ -1,5 +1,5 @@
 # Use the official Python image from the Docker Hub
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 # Install system deps including libgomp for OpenMP support
 RUN apt-get update && \
