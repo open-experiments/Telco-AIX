@@ -1,0 +1,49 @@
+# --- Secrets & credentials: never commit these ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa*
+*.token
+*credentials*.json
+*secret*.yaml
+!*secret*template*.yaml
+kubeconfig
+.kube/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node ---
+node_modules/
+
+# --- ML artifacts / large files ---
+*.ckpt
+*.safetensors
+wandb/
+mlruns/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# --- Local scratch ---
+_to_delete/

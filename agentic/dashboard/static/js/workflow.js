@@ -98,10 +98,15 @@ function updateWorkflowDetails(workflow) {
         Object.entries(workflow.parameters).forEach(([key, value]) => {
             const paramItem = document.createElement('div');
             paramItem.className = 'parameter-item';
-            paramItem.innerHTML = `
-                <span class="param-label">${key}:</span>
-                <span class="param-value">${JSON.stringify(value)}</span>
-            `;
+            // Build spans with textContent (never innerHTML) to avoid XSS
+            const label = document.createElement('span');
+            label.className = 'param-label';
+            label.textContent = `${key}:`;
+            const val = document.createElement('span');
+            val.className = 'param-value';
+            val.textContent = JSON.stringify(value);
+            paramItem.appendChild(label);
+            paramItem.appendChild(val);
             parametersContainer.appendChild(paramItem);
         });
     }
@@ -116,10 +121,15 @@ function updateWorkflowDetails(workflow) {
         Object.entries(workflow.results).forEach(([key, value]) => {
             const resultItem = document.createElement('div');
             resultItem.className = 'result-item';
-            resultItem.innerHTML = `
-                <span class="result-label">${key}:</span>
-                <span class="result-value">${JSON.stringify(value)}</span>
-            `;
+            // Build spans with textContent (never innerHTML) to avoid XSS
+            const label = document.createElement('span');
+            label.className = 'result-label';
+            label.textContent = `${key}:`;
+            const val = document.createElement('span');
+            val.className = 'result-value';
+            val.textContent = JSON.stringify(value);
+            resultItem.appendChild(label);
+            resultItem.appendChild(val);
             resultsContainer.appendChild(resultItem);
         });
     }
@@ -137,17 +147,29 @@ function updateWorkflowDetails(workflow) {
         workflow.steps.forEach(step => {
             const stepElement = document.createElement('div');
             stepElement.className = `step ${getStepStatusClass(step.status)}`;
-            
-            stepElement.innerHTML = `
-                <div class="step-header">
-                    <span class="step-title">${step.step_id}</span>
-                    <span class="step-status ${getStepStatusClass(step.status)}">${step.status}</span>
-                </div>
-                <div class="step-content">
-                    ${step.description || 'No description available'}
-                </div>
-            `;
-            
+
+            // Build elements with textContent (never innerHTML) to avoid XSS
+            const header = document.createElement('div');
+            header.className = 'step-header';
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'step-title';
+            titleSpan.textContent = step.step_id;
+
+            const statusSpan = document.createElement('span');
+            statusSpan.className = `step-status ${getStepStatusClass(step.status)}`;
+            statusSpan.textContent = step.status;
+
+            header.appendChild(titleSpan);
+            header.appendChild(statusSpan);
+
+            const content = document.createElement('div');
+            content.className = 'step-content';
+            content.textContent = step.description || 'No description available';
+
+            stepElement.appendChild(header);
+            stepElement.appendChild(content);
+
             stepsContainer.appendChild(stepElement);
         });
     }

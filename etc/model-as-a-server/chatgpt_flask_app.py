@@ -169,5 +169,8 @@ def chat():
     return jsonify({"response": ai_response})
 
 if __name__ == '__main__':
-    # Bind to all available interfaces
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Bind to all available interfaces.
+    # Debug mode is OFF by default (it exposes the Werkzeug debugger / RCE).
+    # Set FLASK_DEBUG=1 in a local dev environment only if needed.
+    debug_mode = os.environ.get('FLASK_DEBUG', '0') == '1'
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)

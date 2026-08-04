@@ -1,7 +1,7 @@
-pandas
-numpy
-scikit-learn
-torch
-accelerate
-datasets
-seaborn
+pandas>=3.0.5
+numpy>=2.5.1
+scikit-learn>=1.9.0
+torch>=2.13.0
+accelerate>=1.14.0
+datasets>=5.0.1
+seaborn>=0.13.2

@@ -1,2 +1,2 @@
-tensorflow-macos
-tensorflow-metal
+tensorflow-macos>=2.16.2
+tensorflow-metal>=1.2.0

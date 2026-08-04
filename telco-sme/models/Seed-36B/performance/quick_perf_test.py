@@ -4,11 +4,17 @@ Quick Performance Test for Seed-OSS-36B Deployments
 Simple synchronous test with vLLM metrics integration
 """
 
+import os
 import time
 import json
 import requests
 import statistics
 from datetime import datetime
+
+# TLS verification: enabled by default. For lab clusters with self-signed
+# certificates either set REQUESTS_CA_BUNDLE to your cluster CA (preferred)
+# or set PERF_TLS_VERIFY=false explicitly.
+TLS_VERIFY = os.environ.get('PERF_TLS_VERIFY', 'true').strip().lower() not in ('0', 'false', 'no')
 
 def test_endpoint(endpoint, api_key, test_query):
     """Test a single endpoint with timing measurements"""
@@ -33,7 +39,7 @@ def test_endpoint(endpoint, api_key, test_query):
             f"{endpoint}/v1/chat/completions",
             headers=headers,
             json=payload,
-            verify=False,  # Ignore SSL for OpenShift self-signed certs
+            verify=TLS_VERIFY,  # See TLS_VERIFY note at top of file
             timeout=60
         )
         

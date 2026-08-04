@@ -18,20 +18,26 @@ oc apply -f qwen3-embedding-tei-deployment.yaml
 
 **Health Check:**
 ```bash
-curl -k https://qwen3-embedding-tei-route-tme-aix.apps.acmhub.narlabs.io/health
+curl https://qwen3-embedding-tei-route-tme-aix.apps.acmhub.narlabs.io/health
 ```
 
 **Generate Embeddings:**
 ```bash
-curl -k -X POST https://qwen3-embedding-tei-route-tme-aix.apps.acmhub.narlabs.io/embed \
+curl -X POST https://qwen3-embedding-tei-route-tme-aix.apps.acmhub.narlabs.io/embed \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer tme-aix-embedding-2024-secure-token" \
+  -H "Authorization: Bearer ${API_TOKEN}" \
   -d '{"inputs": ["Your text here"]}'
 ```
 
 ## Security
 
-API requires authentication with Bearer token. Without token returns `401 Unauthorized`.
+API requires authentication with a Bearer token. Without a token it returns `401 Unauthorized`.
+
+Fetch the token from the cluster (never hardcode it in docs or code):
+
+```bash
+export API_TOKEN=$(oc get secret qwen3-embedding-api-token -n tme-aix -o jsonpath='{.data.api-token}' | base64 -d)
+```
 
 ## Components
 

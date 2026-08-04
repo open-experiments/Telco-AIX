@@ -42,8 +42,33 @@ except ImportError:
     PLOTTING_AVAILABLE = False
     print("⚠️ Plotly not available. Metrics will be displayed as text.")
 
-# Disable SSL warnings for self-signed certificates
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+# TLS verification: enabled by default. Set SME_TLS_VERIFY=false only for
+# lab environments with self-signed certificates (e.g. OpenShift routes), or
+# point REQUESTS_CA_BUNDLE at your cluster CA to keep verification on.
+TLS_VERIFY = os.environ.get('SME_TLS_VERIFY', 'true').strip().lower() not in ('0', 'false', 'no')
+if not TLS_VERIFY:
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+import tempfile
+
+
+def _validate_upload_path(path: str) -> str:
+    """Safely resolve a Gradio-supplied upload path.
+
+    Ensures the path refers to a real file inside an allowed upload/temp
+    directory, preventing user-controlled path traversal (CodeQL py/path-injection).
+    """
+    allowed_roots = [
+        os.path.realpath(os.environ.get('GRADIO_TEMP_DIR',
+                                        os.path.join(tempfile.gettempdir(), 'gradio'))),
+        os.path.realpath(tempfile.gettempdir()),
+    ]
+    real = os.path.realpath(str(path))
+    if not os.path.isfile(real):
+        raise ValueError("Uploaded file not found")
+    if not any(real == root or real.startswith(root + os.sep) for root in allowed_roots):
+        raise ValueError("Uploaded file outside allowed upload directory")
+    return real
 
 # Configuration
 @dataclass
@@ -1679,14 +1704,32 @@ class MetricsCollector:
             print(f"❌ Error loading metrics archive: {str(e)}")
             print("📦 Starting with empty metrics collection")
     
+    def _resolve_archive_path(self, filename: str) -> Path:
+        """Safely resolve a user-supplied filename inside the archive directory.
+
+        Strips any directory components and verifies the resolved path stays
+        within the archive directory (prevents path traversal / injection).
+        """
+        safe_name = Path(filename).name  # drop any directory components
+        if not safe_name or safe_name in ('.', '..'):
+            raise ValueError(f"Invalid filename: {filename!r}")
+        candidate = (self.archive_dir / safe_name).resolve()
+        base = self.archive_dir.resolve()
+        if not str(candidate).startswith(str(base) + os.sep):
+            raise ValueError(f"Filename escapes archive directory: {filename!r}")
+        return candidate
+
     def export_metrics(self, filename: str = None) -> str:
         """Export metrics data to a file"""
         try:
             if not filename:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = f"metrics_export_{timestamp}.json"
-            
-            export_path = self.archive_dir / filename
+
+            try:
+                export_path = self._resolve_archive_path(filename)
+            except ValueError:
+                return "❌ Export failed: invalid filename"
             
             with self.lock:
                 export_data = {
@@ -1713,11 +1756,14 @@ class MetricsCollector:
     def import_metrics(self, filename: str) -> str:
         """Import metrics data from a file"""
         try:
-            import_path = self.archive_dir / filename
-            
+            try:
+                import_path = self._resolve_archive_path(filename)
+            except ValueError:
+                return "❌ Import failed: invalid filename"
+
             if not import_path.exists():
-                return f"❌ File not found: {filename}"
-            
+                return f"❌ File not found: {Path(filename).name}"
+
             with open(import_path, 'r') as f:
                 import_data = json.load(f)
             
@@ -2406,7 +2452,7 @@ class EmbeddingClient:
                 f"{self.config.embeddings_api_endpoint}/metrics",
                 headers={'Authorization': f'Bearer {self.config.embeddings_api_token}'},
                 timeout=5,
-                verify=False
+                verify=TLS_VERIFY
             )
             if response.status_code == 200:
                 return {
@@ -5176,8 +5222,9 @@ class ChatInterface:
                     if isinstance(file, (str, bytes)):
                         # Gradio binary type returns file path (str) or bytes
                         if isinstance(file, str):
-                            # File path - read the file
-                            with open(file, 'rb' if is_pdf else 'r', encoding=None if is_pdf else 'utf-8') as f:
+                            # File path - validate it stays inside the upload dir, then read
+                            safe_path = _validate_upload_path(file)
+                            with open(safe_path, 'rb' if is_pdf else 'r', encoding=None if is_pdf else 'utf-8') as f:
                                 file_content = f.read()
                         else:
                             # Already bytes
@@ -5187,7 +5234,8 @@ class ChatInterface:
                         file_content = file.read()
                     else:
                         # Handle as file path
-                        with open(file, 'rb' if is_pdf else 'r', encoding=None if is_pdf else 'utf-8') as f:
+                        safe_path = _validate_upload_path(file)
+                        with open(safe_path, 'rb' if is_pdf else 'r', encoding=None if is_pdf else 'utf-8') as f:
                             file_content = f.read()
                     
                     # Handle PDF files

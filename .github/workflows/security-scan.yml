@@ -1,0 +1,70 @@
+name: "Security Scan"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: "23 6 * * 1"  # weekly, Monday 06:23 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history so leaks in old commits are caught
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sast:
+    name: Python SAST (bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install bandit
+        run: pip install bandit
+      - name: Run bandit (fail on high severity)
+        run: bandit -r . --severity-level high
+
+  dependencies:
+    name: Dependency audit (pip-audit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pip-audit
+        run: pip install pip-audit
+      - name: Audit pinned lockfiles
+        run: |
+          python - <<'EOF'
+          import json, subprocess, sys, pathlib
+          failed = False
+          # Audit Pipfile.lock pins (exact versions -> meaningful audit)
+          for lock in pathlib.Path('.').rglob('Pipfile.lock'):
+              pkgs = json.load(open(lock)).get('default', {})
+              reqs = [f"{name}{meta['version']}" for name, meta in pkgs.items() if 'version' in meta]
+              req_file = pathlib.Path('/tmp') / (lock.parent.name + '-lock.txt')
+              req_file.write_text('\n'.join(reqs))
+              print(f"Auditing {lock} ({len(reqs)} pins)")
+              r = subprocess.run(['pip-audit', '-r', str(req_file), '--no-deps'])
+              failed |= r.returncode != 0
+          sys.exit(1 if failed else 0)
+          EOF

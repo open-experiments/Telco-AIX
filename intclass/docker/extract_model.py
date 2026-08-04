@@ -30,8 +30,21 @@ def extract_model_files():
         # Extract the tar file
         print("Extracting compressed model archive...")
         with tarfile.open(compressed_path, 'r:xz') as tar:
-            # Extract all files
-            tar.extractall(path="/tmp/extracted")
+            # Extract safely: the 'data' filter (Python 3.12+/backported to
+            # 3.8.17+) rejects absolute paths, path traversal ('..'), links
+            # escaping the destination, and dangerous file types (tar-slip).
+            try:
+                tar.extractall(path="/tmp/extracted", filter="data")
+            except TypeError:
+                # Older Python without the filter argument: validate members manually
+                base = os.path.realpath("/tmp/extracted")
+                for member in tar.getmembers():
+                    member_path = os.path.realpath(os.path.join(base, member.name))
+                    if not member_path.startswith(base + os.sep):
+                        raise RuntimeError(f"Unsafe path in archive: {member.name}")
+                    if member.islnk() or member.issym():
+                        raise RuntimeError(f"Links not allowed in archive: {member.name}")
+                tar.extractall(path="/tmp/extracted")  # nosec B202 - members validated above
         
         # Find the model directory (should be samples_18806 or similar)
         extracted_base = Path("/tmp/extracted")

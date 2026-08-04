@@ -149,9 +149,11 @@ def predict_and_explain(input_data, xgb_model, preprocessor, bert_model, tokeniz
         final_output = f"Predicted Fault Occurrence Rate: {fault_rate:.2f}%\nStatus: {status}\nSeverity: {severity}\n\nExplanation and Recommendations:\n{explanation}"
 
         return final_output, fault_rate, severity
-    except Exception as e:
-        logging.error(f"Error in predict_and_explain: {str(e)}")
-        return f"An error occurred: {str(e)}", None, None
+    except Exception:
+        # Log full details server-side only; return a generic message to the
+        # caller to avoid leaking internals (CodeQL py/stack-trace-exposure)
+        logging.error("Error in predict_and_explain", exc_info=True)
+        return "An internal error occurred while generating the prediction.", None, None
 
 def generate_custom_explanation(features, fault_rate, severity, threshold):
     explanation = f"The predicted fault occurrence rate of {fault_rate:.2f}% is in the {severity} range. "

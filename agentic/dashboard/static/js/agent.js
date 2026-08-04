@@ -149,16 +149,30 @@ function addAgentMessage(message) {
     
     const messageElement = document.createElement('div');
     messageElement.className = 'message';
-    
+
     const time = new Date(message.timestamp);
-    
-    messageElement.innerHTML = `
-        <div class="message-header">
-            <span class="message-type ${message.type.toLowerCase()}">${message.type}</span>
-            <span class="message-time">${formatDateTime(time)}</span>
-        </div>
-        <div class="message-content">${message.content}</div>
-    `;
+
+    // Build elements with textContent (never innerHTML) to avoid XSS
+    const header = document.createElement('div');
+    header.className = 'message-header';
+
+    const typeSpan = document.createElement('span');
+    typeSpan.className = `message-type ${message.type.toLowerCase()}`;
+    typeSpan.textContent = message.type;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'message-time';
+    timeSpan.textContent = formatDateTime(time);
+
+    header.appendChild(typeSpan);
+    header.appendChild(timeSpan);
+
+    const content = document.createElement('div');
+    content.className = 'message-content';
+    content.textContent = message.content;
+
+    messageElement.appendChild(header);
+    messageElement.appendChild(content);
     
     messagesContainer.insertBefore(messageElement, messagesContainer.firstChild);
 }

@@ -72,12 +72,14 @@ class ACPMessageBroker:
                 await self._process_message(acp_message)
                 
                 return {"status": "success", "message_id": acp_message.header.message_id}
-            except ValidationError as e:
-                self.logger.error(f"Invalid message format: {str(e)}")
-                return {"status": "error", "detail": f"Invalid message format: {str(e)}"}
-            except Exception as e:
-                self.logger.error(f"Error sending message: {str(e)}")
-                return {"status": "error", "detail": str(e)}
+            except ValidationError:
+                # Log full details server-side only; return a generic message to
+                # the client to avoid leaking internals (CodeQL py/stack-trace-exposure)
+                self.logger.error("Invalid message format", exc_info=True)
+                return {"status": "error", "detail": "Invalid message format"}
+            except Exception:
+                self.logger.error("Error sending message", exc_info=True)
+                return {"status": "error", "detail": "Internal error while processing message"}
         
     async def _handle_connection(self, websocket: WebSocket, agent_id: str):
         """Handle a WebSocket connection from an agent.

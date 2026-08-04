@@ -1,0 +1,56 @@
+# Dependabot configuration for Telco-AIX
+# Watches Python manifests in each project folder, Docker base images, and
+# GitHub Actions. Also enable "Dependabot alerts" + "Dependabot security
+# updates" in Settings -> Advanced Security for vulnerability alerts.
+version: 2
+updates:
+  # GitHub Actions workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # Python projects (requirements.txt / Pipfile per folder)
+  - package-ecosystem: "pip"
+    directories:
+      - "/5gnetops"
+      - "/5gprod"
+      - "/agentic"
+      - "/airan-energy"
+      - "/airan-pusch-receiver"
+      - "/autonet"
+      - "/churn"
+      - "/crm"
+      - "/intclass"
+      - "/iot-sec"
+      - "/llm-rca"
+      - "/revenueassurance"
+      - "/revenueassurance/docker"
+      - "/secops"
+      - "/serviceassurance"
+      - "/smartgrid"
+      - "/starlink"
+      - "/sustainability"
+      - "/telco-sme"
+      - "/telco-sme/old"
+      - "/telco-sme/models/Seed-36B/performance"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      python-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Container images
+  - package-ecosystem: "docker"
+    directories:
+      - "/crm"
+      - "/churn"
+      - "/etc/model-as-a-server"
+      - "/intclass/docker"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5

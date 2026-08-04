@@ -1640,14 +1640,32 @@ class MetricsCollector:
             print(f"❌ Error loading metrics archive: {str(e)}")
             print("📦 Starting with empty metrics collection")
     
+    def _resolve_archive_path(self, filename: str) -> Path:
+        """Safely resolve a user-supplied filename inside the archive directory.
+
+        Strips any directory components and verifies the resolved path stays
+        within the archive directory (prevents path traversal / injection).
+        """
+        safe_name = Path(filename).name  # drop any directory components
+        if not safe_name or safe_name in ('.', '..'):
+            raise ValueError(f"Invalid filename: {filename!r}")
+        candidate = (self.archive_dir / safe_name).resolve()
+        base = self.archive_dir.resolve()
+        if not str(candidate).startswith(str(base) + os.sep):
+            raise ValueError(f"Filename escapes archive directory: {filename!r}")
+        return candidate
+
     def export_metrics(self, filename: str = None) -> str:
         """Export metrics data to a file"""
         try:
             if not filename:
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = f"metrics_export_{timestamp}.json"
-            
-            export_path = self.archive_dir / filename
+
+            try:
+                export_path = self._resolve_archive_path(filename)
+            except ValueError:
+                return "❌ Export failed: invalid filename"
             
             with self.lock:
                 export_data = {
@@ -1674,11 +1692,14 @@ class MetricsCollector:
     def import_metrics(self, filename: str) -> str:
         """Import metrics data from a file"""
         try:
-            import_path = self.archive_dir / filename
-            
+            try:
+                import_path = self._resolve_archive_path(filename)
+            except ValueError:
+                return "❌ Import failed: invalid filename"
+
             if not import_path.exists():
-                return f"❌ File not found: {filename}"
-            
+                return f"❌ File not found: {Path(filename).name}"
+
             with open(import_path, 'r') as f:
                 import_data = json.load(f)
             

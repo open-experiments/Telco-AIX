@@ -110,30 +110,48 @@ function fetchWorkflows() {
         .catch(error => console.error('Error fetching workflows:', error));
 }
 
+// Helper: create a <td> with safe text content (prevents XSS)
+function createCell(text) {
+    const td = document.createElement('td');
+    td.textContent = text == null ? '' : String(text);
+    return td;
+}
+
 // Update agents table
 function updateAgentsTable(agents) {
     const tableBody = document.getElementById('agentsTableBody');
     tableBody.innerHTML = '';
-    
+
     agents.forEach(agent => {
         const row = document.createElement('tr');
-        
+
         const statusClass = `status-${agent.status.toLowerCase()}`;
-        
-        row.innerHTML = `
-            <td>${agent.agent_id}</td>
-            <td>${agent.name}</td>
-            <td>${agent.agent_type}</td>
-            <td><span class="status-badge ${statusClass}">${agent.status}</span></td>
-            <td>${formatDateTime(agent.last_seen)}</td>
-            <td>
-                <a href="/agents/${agent.agent_id}" class="action-button">Details</a>
-            </td>
-        `;
-        
+
+        // Build cells with textContent (never innerHTML) to avoid XSS
+        row.appendChild(createCell(agent.agent_id));
+        row.appendChild(createCell(agent.name));
+        row.appendChild(createCell(agent.agent_type));
+
+        const statusTd = document.createElement('td');
+        const statusBadge = document.createElement('span');
+        statusBadge.className = `status-badge ${statusClass}`;
+        statusBadge.textContent = agent.status;
+        statusTd.appendChild(statusBadge);
+        row.appendChild(statusTd);
+
+        row.appendChild(createCell(formatDateTime(agent.last_seen)));
+
+        const actionTd = document.createElement('td');
+        const detailsLink = document.createElement('a');
+        detailsLink.href = `/agents/${encodeURIComponent(agent.agent_id)}`;
+        detailsLink.className = 'action-button';
+        detailsLink.textContent = 'Details';
+        actionTd.appendChild(detailsLink);
+        row.appendChild(actionTd);
+
         tableBody.appendChild(row);
     });
-    
+
     filterAgents();
 }
 
@@ -144,25 +162,41 @@ function updateWorkflowsTable(workflows) {
     
     workflows.forEach(workflow => {
         const row = document.createElement('tr');
-        
+
         const statusClass = `status-${workflow.status.toLowerCase()}`;
         const progress = calculateWorkflowProgress(workflow);
-        
-        row.innerHTML = `
-            <td>${workflow.workflow_id}</td>
-            <td>${workflow.workflow_type}</td>
-            <td><span class="status-badge ${statusClass}">${workflow.status}</span></td>
-            <td>${formatDateTime(workflow.created_at)}</td>
-            <td>
-                <div class="progress-bar">
-                    <div class="progress" style="width: ${progress}%"></div>
-                </div>
-            </td>
-            <td>
-                <a href="/workflows/${workflow.workflow_id}" class="action-button">Details</a>
-            </td>
-        `;
-        
+
+        // Build cells with textContent (never innerHTML) to avoid XSS
+        row.appendChild(createCell(workflow.workflow_id));
+        row.appendChild(createCell(workflow.workflow_type));
+
+        const statusTd = document.createElement('td');
+        const statusBadge = document.createElement('span');
+        statusBadge.className = `status-badge ${statusClass}`;
+        statusBadge.textContent = workflow.status;
+        statusTd.appendChild(statusBadge);
+        row.appendChild(statusTd);
+
+        row.appendChild(createCell(formatDateTime(workflow.created_at)));
+
+        const progressTd = document.createElement('td');
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        const progressFill = document.createElement('div');
+        progressFill.className = 'progress';
+        progressFill.style.width = `${Number(progress) || 0}%`;
+        progressBar.appendChild(progressFill);
+        progressTd.appendChild(progressBar);
+        row.appendChild(progressTd);
+
+        const actionTd = document.createElement('td');
+        const detailsLink = document.createElement('a');
+        detailsLink.href = `/workflows/${encodeURIComponent(workflow.workflow_id)}`;
+        detailsLink.className = 'action-button';
+        detailsLink.textContent = 'Details';
+        actionTd.appendChild(detailsLink);
+        row.appendChild(actionTd);
+
         tableBody.appendChild(row);
     });
     
@@ -489,14 +523,25 @@ function addEvent(event) {
     
     const eventElement = document.createElement('div');
     eventElement.className = 'event';
-    
+
     const time = new Date(event.timestamp);
-    
-    eventElement.innerHTML = `
-        <span class="event-time">${formatTime(time)}</span>
-        <span class="event-type ${event.agent_type}">${event.agent_type}</span>
-        <span class="event-message">${event.message}</span>
-    `;
+
+    // Build spans with textContent (never innerHTML) to avoid XSS
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'event-time';
+    timeSpan.textContent = formatTime(time);
+
+    const typeSpan = document.createElement('span');
+    typeSpan.className = `event-type ${event.agent_type}`;
+    typeSpan.textContent = event.agent_type;
+
+    const messageSpan = document.createElement('span');
+    messageSpan.className = 'event-message';
+    messageSpan.textContent = event.message;
+
+    eventElement.appendChild(timeSpan);
+    eventElement.appendChild(typeSpan);
+    eventElement.appendChild(messageSpan);
     
     eventsContainer.insertBefore(eventElement, eventsContainer.firstChild);
     

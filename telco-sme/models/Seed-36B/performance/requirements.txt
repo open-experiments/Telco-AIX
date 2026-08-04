@@ -1,3 +1,3 @@
 aiohttp>=3.8.0
-asyncio
-statistics
+# asyncio removed: part of the Python standard library
+# statistics removed: part of the Python standard library

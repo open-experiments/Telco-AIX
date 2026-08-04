@@ -1,5 +1,15 @@
 ---
 # Secret for API authentication token
+#
+# SECURITY: Never commit real token values to git. Create the secret
+# out-of-band before applying this manifest, e.g.:
+#
+#   oc create secret generic qwen3-embedding-api-token \
+#     --namespace tme-aix \
+#     --from-literal=api-token="$(openssl rand -hex 32)"
+#
+# The stringData placeholder below is only for reference and will fail
+# closed (invalid token) if applied as-is.
 apiVersion: v1
 kind: Secret
 metadata:
@@ -9,9 +19,8 @@ metadata:
     app: qwen3-embedding-tei
     component: auth
 type: Opaque
-data:
-  # Base64 encoded API token: "tme-aix-embedding-2024-secure-token"
-  api-token: dG1lLWFpeC1lbWJlZGRpbmctMjAyNC1zZWN1cmUtdG9rZW4=
+stringData:
+  api-token: "REPLACE_ME__create-secret-out-of-band"
 ---
 # ServiceAccount for Qwen3 Embedding (TEI version)
 apiVersion: v1

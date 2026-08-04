@@ -167,8 +167,11 @@ def predict():
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
         
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        # Log full details server-side only; return a generic message to the
+        # client to avoid leaking internals (CodeQL py/stack-trace-exposure)
+        app.logger.exception("Error during inference")
+        return jsonify({'error': 'Internal Server Error'}), 500
 
 @app.route('/debug/cors', methods=['GET', 'OPTIONS'])
 def debug_cors():
