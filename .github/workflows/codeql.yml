@@ -15,6 +15,9 @@ jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
+    # Skip Dependabot-triggered runs: they get a read-only token, so the
+    # SARIF upload always fails. Analysis re-runs on merge to main anyway.
+    if: github.actor != 'dependabot[bot]'
     permissions:
       security-events: write
       contents: read
@@ -25,7 +28,7 @@ jobs:
         language: [ "python", "javascript-typescript" ]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3

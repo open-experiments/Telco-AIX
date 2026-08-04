@@ -28,7 +28,7 @@ RUN ls -la /models/ && \
     echo "Model verification successful"
 
 # Final image containing only the essential model files
-FROM registry.access.redhat.com/ubi9/ubi-micro:9.4
+FROM registry.access.redhat.com/ubi9/ubi-micro:9.8
 
 # Copy the extracted model files from the base container
 COPY --from=base /models /models

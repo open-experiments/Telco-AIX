@@ -1,3 +1,10 @@
+> [!WARNING]
+> **⚠️ DEPRECATED — superseded by [agent-school](https://github.com/open-experiments/agent-school).**
+> This experimental framework is no longer maintained. All new agent-focused work
+> (frameworks, patterns, telco agent use cases) now lives in the dedicated
+> [open-experiments/agent-school](https://github.com/open-experiments/agent-school) repository.
+> This folder is kept for historical reference only.
+
 # Telecom AI Agent Framework
 
 A cloud-native framework for autonomous network management through cooperating AI agents that detect, diagnose, plan, and resolve telecom network issues without human intervention. 

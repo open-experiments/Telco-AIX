@@ -25,7 +25,7 @@ Welcome to the **Telco-AIX** collaborative experimental workspace –> where we 
 | 🛰️ Connectivity | [Starlink QoE](https://github.com/open-experiments/Telco-AIX/tree/main/starlink) | Satellite ISP Experience |
 | 🖥️ Network Operations | [NoC AI Augmentation](https://github.com/open-experiments/Telco-AIX/tree/main/5gprod) | OSS Optimization |
 | 🎩 IT Management | [ITSM Automation](https://github.com/open-experiments/Telco-AIX/tree/main/itsm-ai-automation) | Intelligent Service Management |
-| 🤖 Agentic Telco-AI | [Agentic Framework](https://github.com/open-experiments/Telco-AIX/tree/main/agentic) <br> [Autonomous 5G Network](https://github.com/open-experiments/Telco-AIX/tree/main/autonet)| Agentic Telco |
+| 🤖 Agentic Telco-AI | [Agent School](https://github.com/open-experiments/agent-school) (successor to the deprecated [Agentic Framework](https://github.com/open-experiments/Telco-AIX/tree/main/agentic)) <br> [Autonomous 5G Network](https://github.com/open-experiments/Telco-AIX/tree/main/autonet)| Agentic Telco |
 | 🥇 Telco Expert Portal | [One Stop KnowHow Shop](https://github.com/open-experiments/Telco-AIX/tree/main/telco-sme) | Prompt Engineering & Embeddings Search |
 | 📶 AI-RAN  | [Radio Network Energy Efficiency](https://github.com/open-experiments/Telco-AIX/tree/main/airan-energy) <br> [Neural PUSCH Receiver](https://github.com/open-experiments/Telco-AIX/tree/main/airan-pusch-receiver) | RAN Sustainability & L1 AI |
 
