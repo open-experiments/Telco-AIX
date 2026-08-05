@@ -54,3 +54,10 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    ignore:
+      # Stay on python:3.12-slim: the ML stack (tensorflow/torch/lightgbm)
+      # does not ship wheels for newer Python yet. Remove this when it does.
+      - dependency-name: "python"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
