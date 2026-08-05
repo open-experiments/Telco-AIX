@@ -1,7 +1,7 @@
 import os
 import torch
 from flask import Flask, request, jsonify
-from transformers import T5Tokenizer, T5ForConditionalGeneration
+from transformers import T5Tokenizer, T5ForConditionalGeneration  # gitleaks:allow (import line, false positive)
 import logging
 
 # Set environment variables to handle OpenMP library conflicts

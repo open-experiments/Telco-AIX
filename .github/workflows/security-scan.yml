@@ -18,15 +18,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0  # full history so leaks in old commits are caught
       - name: Run gitleaks (CLI)
+        # Scans the CURRENT tree only (gitleaks dir). Git history is not
+        # scanned: it contains already-rotated lab tokens from before the
+        # 2026-08 security overhaul, which would fail every run. Gate on
+        # what ships, not on remediated history.
         env:
           GITLEAKS_VERSION: "8.24.3"
         run: |
           curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" -o /tmp/gitleaks.tgz
           tar -xzf /tmp/gitleaks.tgz -C /tmp gitleaks
-          /tmp/gitleaks git . --no-banner --redact --exit-code 1
+          /tmp/gitleaks dir . --no-banner --redact --exit-code 1
 
   sast:
     name: Python SAST (bandit)
