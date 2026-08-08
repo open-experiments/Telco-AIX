@@ -79,23 +79,6 @@ revision `e120ca76`, vLLM v0.26.0, temperature 0) with both harnesses —
 results agree within sampling stderr on every task (see
 `reference/parity_validation_2026-08-08.md`).
 
-## Reference numbers (measured on venice.narlabs.io, 2026-08-07)
-
-RTX PRO 6000 Blackwell 96GB, vLLM v0.26.0, temperature 0, lite tier:
-
-| Benchmark | OTel-2.0-31B-IT (`e120ca76`) | Gemma-4-31B-IT base (`842da379`) | 
-|---|---|---|---|
-| TeleQnA | 0.795 | 0.805 |
-| TeleTables | 0.340 | 0.350 |
-| ORANBench | 0.787 | 0.827 | 
-| srsRANBench | 0.853 | 0.820 |
-| TeleMath | 0.580 | 0.740 | 
-| TeleLogs | 0.420 | 0.530 | 
-| 3GPP-TSG | 0.600 | 0.470 | 
-| **Average** | **0.625** | **0.649** | 
-
-Full analysis in the verification report under `reference/`.
-
 ## Design notes
 
 - **Everything embedded**: gzipped JSONL keeps the datasets ~4.5MB in-repo.
