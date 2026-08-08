@@ -43,6 +43,13 @@ While both models achieved the expected accuracy on our synthetic dataset, Light
 | 18 | SupportChannel           | object  |
 | 19 | HasChurned               | bool    |
 
+## Dataset
+
+The synthetic dataset used to train these models is available on Hugging Face:
+https://huggingface.co/datasets/Omer1234567/telco-churn-synthetic
+
+You can also regenerate it yourself with `01-telco-customer-churn-data-generator.py`. Note that the generator is not seeded, so re-running it produces different values, not an exact copy of the published dataset.
+
 ## Model Accuracy Results
 
 BalancedRandomForestClassifier Results:<br/>
