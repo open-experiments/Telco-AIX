@@ -1,16 +1,10 @@
 # Telco-AIX Self-Contained Telco LLM Eval Framework
 
 A zero-external-dependency benchmark harness for telecom LLMs. Everything
-needed to evaluate a model — datasets, prompts, scorers, runner — lives in
-this folder. If every upstream source (the GSMA leaderboard, the
-`gsma-labs/evals` repo, the Hugging Face datasets) disappeared tomorrow,
-these benchmarks still run, byte-for-byte identical.
+needed to evaluate a model; datasets, prompts, scorers, runner which all lives in
+this folder. 
 
-Born out of the **GSMA Open Telco Leaderboard verification exercise**
-(2026-08-07, see `reference/GSMA-OTel2-Leaderboard-Verification-Report_2026-08-07.md`),
-where we measured AT&T's OTel-2.0-LLM-31B-IT public checkpoint at 0.625
-average against its claimed rank-1 score of 0.903 — and learned the hard way
-why pinned, self-contained, independently runnable evals matter.
+Origin: Born out of the **GSMA Open Telco Leaderboard verification exercise**
 
 ## What's included
 
