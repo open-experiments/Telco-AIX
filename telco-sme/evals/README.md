@@ -83,16 +83,16 @@ results agree within sampling stderr on every task (see
 
 RTX PRO 6000 Blackwell 96GB, vLLM v0.26.0, temperature 0, lite tier:
 
-| Benchmark | OTel-2.0-31B-IT (`e120ca76`) | Gemma-4-31B-IT base (`842da379`) | Leaderboard claim (OTel-2.0) |
+| Benchmark | OTel-2.0-31B-IT (`e120ca76`) | Gemma-4-31B-IT base (`842da379`) | 
 |---|---|---|---|
-| TeleQnA | 0.795 | 0.805 | 0.917 |
-| TeleTables | 0.340 | 0.350 | 0.798 |
-| ORANBench | 0.787 | 0.827 | 0.936 |
-| srsRANBench | 0.853 | 0.820 | 0.915 |
-| TeleMath | 0.580 | 0.740 | 0.898 |
-| TeleLogs | 0.420 | 0.530 | 0.982 |
-| 3GPP-TSG | 0.600 | 0.470 | 0.873 |
-| **Average** | **0.625** | **0.649** | **0.903** |
+| TeleQnA | 0.795 | 0.805 |
+| TeleTables | 0.340 | 0.350 |
+| ORANBench | 0.787 | 0.827 | 
+| srsRANBench | 0.853 | 0.820 |
+| TeleMath | 0.580 | 0.740 | 
+| TeleLogs | 0.420 | 0.530 | 
+| 3GPP-TSG | 0.600 | 0.470 | 
+| **Average** | **0.625** | **0.649** | 
 
 Full analysis in the verification report under `reference/`.
 
