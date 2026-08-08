@@ -6,7 +6,7 @@
 
 | | OTel-2.0-LLM-31B-IT | Base Gemma-4-31B-IT |
 |---|---|---|
-| Source | `farbodtavakkoli/OTel-2.0-LLM-31B-IT` (AT&T) | `google/gemma-4-31B-it` (OTel's branch point) |
+| Source | OTel-2.0-LLM-31B-IT (public Hugging Face checkpoint) | `google/gemma-4-31B-it` (OTel's branch point) |
 | Revision | **pinned `e120ca76`** (2026-08-07 snapshot) | **pinned `842da379`** |
 | Runtime | vLLM v0.26.0 (upstream `vllm-openai`), TP=1, BF16, max-model-len 65,536 | same (multimodal profiling disabled) |
 | GPU | 1× RTX PRO 6000 Blackwell 96GB | 1× RTX PRO 6000 Blackwell 96GB |
@@ -18,9 +18,9 @@
 
 ## Results
 
-Accuracy (± stderr). The **AT&T claim column is the leaderboard's own entry for OTel-2.0-LLM-31B-IT** — the exact model name we deployed — currently **rank #1 with a claimed 0.9027 average** (leaderboard data refreshed 2026-08-07). The base Gemma-4-31B-IT column isolates what the OTel post-training changed.
+Accuracy (± stderr). The **claim column is the leaderboard's own entry for OTel-2.0-LLM-31B-IT** — the exact model name we deployed — currently **rank #1 with a claimed 0.9027 average** (leaderboard data refreshed 2026-08-07). The base Gemma-4-31B-IT column isolates what the OTel post-training changed.
 
-| Benchmark | AT&T claim: OTel-2.0-LLM-31B-IT (#1) | **OTel-2.0-31B-IT (measured)** | **Base Gemma-4-31B-IT (measured)** |
+| Benchmark | Leaderboard claim: OTel-2.0-LLM-31B-IT (#1) | **OTel-2.0-31B-IT (measured)** | **Base Gemma-4-31B-IT (measured)** |
 |---|---|---|---|
 | TeleQnA | 0.917 ± 0.003 | 0.795 ± 0.013 | **0.805** ± 0.013 |
 | TeleTables | 0.798 ± 0.018 | 0.340 ± 0.048 | **0.350** ± 0.048 |
@@ -41,7 +41,7 @@ Gap of measured OTel vs its claim: **−0.278 average** (worst: TeleLogs −0.56
 
 **3. The base-model control shows this OTel checkpoint's post-training has not (yet) paid off on these benchmarks.** Base Gemma-4-31B-IT averages **0.649 vs OTel's 0.625** under identical serving and eval conditions. The finetune's only significant gain is 3GPP-TSG (+0.13 — standards-document work, plausibly the domain corpus showing through). Against that, OTel *regresses* on TeleMath (−0.16) and TeleLogs (−0.11) — a classic post-training trade: domain instruction data displacing general reasoning ability. TeleQnA/TeleTables/ORANBench/srsRAN deltas are within ~1–2 stderr (noise). The claim implies the finetune adds ~+0.25 over its base; we measure −0.02.
 
-**4. Weakest OTel areas:** TeleTables (0.34) and TeleLogs (0.42) — table interpretation and log diagnostics — exactly where the leaderboard entry claims near-perfect scores (0.798 / 0.982). This is the single biggest divergence and the first question worth raising with the OTel team.
+**4. Weakest OTel areas:** TeleTables (0.34) and TeleLogs (0.42) — table interpretation and log diagnostics — exactly where the leaderboard entry claims near-perfect scores (0.798 / 0.982). This is the single biggest divergence and a constructive question to raise with the leaderboard maintainers.
 
 ## Gap-Attribution Experiments
 

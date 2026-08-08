@@ -1,10 +1,16 @@
 # Telco-AIX Self-Contained Telco LLM Eval Framework
 
 A zero-external-dependency benchmark harness for telecom LLMs. Everything
-needed to evaluate a model; datasets, prompts, scorers, runner which all lives in
-this folder. 
+needed to evaluate a model — datasets, prompts, scorers, runner — lives in
+this folder. If every upstream source (the GSMA leaderboard, the
+`gsma-labs/evals` repo, the Hugging Face datasets) disappeared tomorrow,
+these benchmarks still run, byte-for-byte identical.
 
-Origin: Born out of the **GSMA Open Telco Leaderboard verification exercise**
+Born out of the **GSMA Open Telco Leaderboard verification exercise**
+(2026-08-07, see `reference/GSMA-OTel2-Leaderboard-Verification-Report_2026-08-07.md`),
+where we measured the public OTel-2.0-LLM-31B-IT checkpoint at 0.625
+average against its claimed rank-1 score of 0.903 — and learned the hard way
+why pinned, self-contained, independently runnable evals matter.
 
 ## What's included
 
@@ -78,6 +84,23 @@ Parity was validated by re-running the same model (OTel-2.0-LLM-31B-IT,
 revision `e120ca76`, vLLM v0.26.0, temperature 0) with both harnesses —
 results agree within sampling stderr on every task (see
 `reference/parity_validation_2026-08-08.md`).
+
+## Reference numbers (measured on venice.narlabs.io, 2026-08-07)
+
+RTX PRO 6000 Blackwell 96GB, vLLM v0.26.0, temperature 0, lite tier:
+
+| Benchmark | OTel-2.0-31B-IT (`e120ca76`) | Gemma-4-31B-IT base (`842da379`) | Leaderboard claim (OTel-2.0) |
+|---|---|---|---|
+| TeleQnA | 0.795 | 0.805 | 0.917 |
+| TeleTables | 0.340 | 0.350 | 0.798 |
+| ORANBench | 0.787 | 0.827 | 0.936 |
+| srsRANBench | 0.853 | 0.820 | 0.915 |
+| TeleMath | 0.580 | 0.740 | 0.898 |
+| TeleLogs | 0.420 | 0.530 | 0.982 |
+| 3GPP-TSG | 0.600 | 0.470 | 0.873 |
+| **Average** | **0.625** | **0.649** | **0.903** |
+
+Full analysis in the verification report under `reference/`.
 
 ## Design notes
 

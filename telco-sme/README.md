@@ -137,16 +137,20 @@ System prompts are loaded from `system_prompts.json`, making it easy to customiz
 
 ### File Structure
 ```
-├── sme-web-ui-v2.py        # Main application (enhanced version)
+├── sme-web-ui-v2.py        # SME portal app (Gradio) — includes the 🏆 Benchmark tab
 ├── system_prompts.json     # Expert persona definitions (7+ personas)
-├── sessions/               # Session storage directory (auto-created)
 ├── requirements-v2.txt     # Python dependencies
-├── benchmarks/            # GenAI benchmark tests for vendors (Ericsson/Nokia/Mavenir, preserved)
-├── evals/                 # Self-contained Open-Telco eval framework (embedded datasets, zero external deps)
-├── models/                # Model-specific configurations
-├── telcos-last-exam/      # Telco exam questions and comparisons
-├── images/                # Screenshots and documentation images
-└── README.md              # This documentation
+├── sessions/               # Session storage directory (auto-created)
+├── benchmarks/             # ALL benchmark & eval assets — see benchmarks/README.md
+│   ├── open-telco/         #   self-contained Open-Telco eval framework (embedded datasets)
+│   ├── vendor-genai-tests/ #   Ericsson / Nokia / Mavenir GenAI tests + Telco5G reports
+│   ├── telcos-last-exam/   #   hardest-questions telco exam + per-model answers
+│   ├── model-reports/      #   per-model benchmark answers & perf reports (Qwen3, Seed-36B)
+│   └── embeddings/         #   embeddings benchmark notes
+├── deployments/            # Model deployment assets (Seed-36B scripts, YAML, docs)
+├── archive/                # Legacy v1 application
+├── images/                 # Screenshots and documentation images
+└── README.md               # This documentation
 ```
 
 ## Configuration
@@ -204,25 +208,35 @@ Currently configured for OpenAI-compatible endpoints. The application has been t
 
 Two complementary benchmark assets live in this project:
 
-- **`benchmarks/`** — the original Telco-AIX vendor GenAI test sets
-  (Ericsson / Nokia / Mavenir) with historical results. Preserved as-is.
-- **`evals/`** — a **self-contained Open-Telco eval framework**: the 8 GSMA
-  benchmarks (TeleQnA, TeleTables, TeleMath, TeleLogs, 3GPP-TSG, ORANBench,
-  srsRANBench, 6G-Bench) with both lite and full datasets **embedded in the
-  repo** (gzipped JSONL, ~4.5MB) and a single-file runner (`otel_eval.py`,
-  stdlib + `requests` only). No Hugging Face, no gsma-labs/evals, no
-  inspect-ai required at runtime — evals stay reproducible even if every
-  upstream source disappears. Scoring parity with the official Inspect AI
-  harness is validated to ≤1pp on all 7 leaderboard tasks
-  (see `evals/reference/parity_validation_2026-08-08.md`).
+All benchmark and eval assets are consolidated under **`benchmarks/`**
+(see [`benchmarks/README.md`](benchmarks/README.md) for the full index):
+
+- **`benchmarks/open-telco/`** — a **self-contained Open-Telco eval
+  framework**: the 8 GSMA telecom benchmarks (TeleQnA, TeleTables, TeleMath,
+  TeleLogs, 3GPP-TSG, ORANBench, srsRANBench, 6G-Bench) with both lite and
+  full datasets **embedded in the repo** (gzipped JSONL, ~4.5MB) and a
+  single-file runner (`otel_eval.py`, stdlib + `requests` only). No Hugging
+  Face, no external eval repo, no inspect-ai required at runtime — results
+  stay reproducible even if every upstream source disappears. Scoring parity
+  with the official Inspect AI harness is validated to ≤1pp on all 7
+  leaderboard tasks (`benchmarks/open-telco/reference/parity_validation_2026-08-08.md`).
+- **`benchmarks/vendor-genai-tests/`** — the original vendor GenAI test sets
+  (Ericsson / Nokia / Mavenir) with historical results, preserved.
+- **`benchmarks/telcos-last-exam/`** — hardest-questions telco exam with
+  per-model answer sheets.
+- **`benchmarks/model-reports/`** — per-model benchmark answers and
+  performance reports collected on this lab.
+
+Run from the CLI:
 
 ```bash
-cd evals
+cd benchmarks/open-telco
 python3 otel_eval.py --endpoint https://<model-route>/v1 --model <name>
 ```
 
-See `evals/README.md` for full usage, provenance, and the GSMA leaderboard
-verification report that motivated this framework.
+Or interactively from the portal: the **🏆 Benchmark** tab runs any subset of
+the Open-Telco suite against the configured model endpoint and streams live
+per-task progress, accuracies, and a final summary into the UI.
 
 ## Development
 

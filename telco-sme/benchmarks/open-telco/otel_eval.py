@@ -270,7 +270,10 @@ class Client:
 # Runner
 # --------------------------------------------------------------------------
 
-def run_task(task, tier, client, workers, limit, out_dir):
+def run_task(task, tier, client, workers, limit, out_dir, progress_cb=None):
+    """Run one benchmark. progress_cb(done, total, correct), if given, is
+    invoked after every completed sample (used by the SME portal's live
+    Benchmark tab)."""
     records = load_dataset(task, tier, limit)
     spec = TASKS[task]
     results = [None] * len(records)
@@ -300,6 +303,11 @@ def run_task(task, tier, client, workers, limit, out_dir):
             with lock:
                 done += 1
                 correct += 1 if row["correct"] else 0
+                if progress_cb:
+                    try:
+                        progress_cb(done, len(records), correct)
+                    except Exception:
+                        pass
                 if done % 25 == 0 or done == len(records):
                     print(f"  {task}: {done}/{len(records)}  "
                           f"acc={correct/done:.3f}", flush=True)

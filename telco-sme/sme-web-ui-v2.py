@@ -3769,7 +3769,110 @@ class ChatInterface:
             diagnostic_text += "- Streaming disabled, large contexts may timeout\n"
         
         return diagnostic_text
-    
+
+    # ------------------------------------------------------------------
+    # Benchmark tab — embedded Open-Telco eval framework (benchmarks/open-telco)
+    # ------------------------------------------------------------------
+    BENCHMARK_FRAMEWORK_DIR = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "benchmarks", "open-telco")
+
+    def _load_eval_framework(self):
+        """Import benchmarks/open-telco/otel_eval.py (hyphenated dir => importlib)."""
+        import importlib.util
+        path = os.path.join(self.BENCHMARK_FRAMEWORK_DIR, "otel_eval.py")
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"Eval framework not found at {path} — is benchmarks/open-telco/ present?")
+        spec = importlib.util.spec_from_file_location("otel_eval", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    def run_benchmark(self, tasks, tier, limit, max_connections, max_tokens):
+        """Generator handler for the Benchmark tab: runs the selected
+        benchmarks against the configured model endpoint and yields
+        (status_md, table_rows, summary_md) for real-time UI updates."""
+        import tempfile
+        import time as _time
+
+        rows = []
+        try:
+            mod = self._load_eval_framework()
+        except Exception as e:
+            yield f"❌ {e}", [], ""
+            return
+        if not tasks:
+            yield "⚠️ Select at least one benchmark.", [], ""
+            return
+
+        limit = int(limit) if limit and int(limit) > 0 else None
+        max_tokens = int(max_tokens) if max_tokens and int(max_tokens) > 0 else None
+        client = mod.Client(
+            self.config.api_endpoint.rstrip("/") + "/v1",
+            self.config.model_name,
+            api_key=(self.config.api_token if self.config.use_token_auth else "none"),
+            temperature=0.0,
+            max_tokens=max_tokens,
+            verify=self.config.verify_ssl,
+            timeout=600,
+        )
+        out_dir = tempfile.mkdtemp(prefix="benchmark_")
+        summary = []
+        t_start = _time.time()
+
+        for ti, task in enumerate(tasks):
+            prog = {"done": 0, "total": 0, "correct": 0}
+            plock = threading.Lock()
+
+            def _cb(done, total, correct, _p=prog, _l=plock):
+                with _l:
+                    _p["done"], _p["total"], _p["correct"] = done, total, correct
+
+            holder = {}
+
+            def _worker(_task=task, _h=holder, _cb=_cb):
+                try:
+                    _h["result"] = mod.run_task(
+                        _task, tier, client, int(max_connections), limit,
+                        out_dir, progress_cb=_cb)
+                except Exception as e:
+                    _h["error"] = str(e)
+
+            th = threading.Thread(target=_worker, daemon=True)
+            th.start()
+            while th.is_alive():
+                with plock:
+                    d, t, c = prog["done"], prog["total"], prog["correct"]
+                acc = (c / d) if d else 0.0
+                live = rows + [[task, t or "…", d,
+                                f"{acc:.3f}" if d else "…", "", "▶ running"]]
+                yield (f"**Running `{task}`** ({ti + 1}/{len(tasks)}) — "
+                       f"{d}/{t or '?'} samples · elapsed {int(_time.time() - t_start)}s",
+                       live, "")
+                _time.sleep(2)
+            th.join()
+
+            if "error" in holder:
+                rows.append([task, "", "", "", "", f"❌ {holder['error'][:80]}"])
+            else:
+                r = holder["result"]
+                summary.append(r)
+                rows.append([task, r["n"], r["n"], f"{r['accuracy']:.4f}",
+                             f"±{r['stderr']:.4f}", "✅ done"])
+            yield (f"Finished `{task}` ({ti + 1}/{len(tasks)})", list(rows), "")
+
+        if summary:
+            avg = sum(s["accuracy"] for s in summary) / len(summary)
+            md = (f"### 🏁 Benchmark run complete — average accuracy "
+                  f"**{avg:.4f}** across {len(summary)} benchmark(s)\n\n"
+                  f"Model: `{self.config.model_name}` · endpoint: "
+                  f"`{self.config.api_endpoint}` · tier: **{tier}** · "
+                  f"temperature 0.0 · {int(_time.time() - t_start)}s total\n\n"
+                  f"Per-sample transcripts saved to `{out_dir}` (app container).")
+        else:
+            md = "⚠️ No benchmarks completed successfully."
+        yield ("✅ Benchmark run complete", list(rows), md)
+
     def create_interface(self) -> gr.Blocks:
         """Create enhanced Gradio interface"""
         
@@ -4410,6 +4513,53 @@ class ChatInterface:
                                     elem_id="metrics-display-2"
                                 )
             
+                with gr.TabItem("🏆 Benchmark"):
+                    gr.Markdown(
+                        "Run the **embedded Open-Telco benchmark suite** "
+                        "(`benchmarks/open-telco/`) against the configured model "
+                        "endpoint, with live progress. Datasets are embedded in "
+                        "this repository — no external dependencies. Scoring is "
+                        "parity-validated against the official GSMA harness."
+                    )
+                    with gr.Row():
+                        bench_tasks = gr.CheckboxGroup(
+                            choices=["teleqna", "teletables", "oranbench",
+                                     "srsranbench", "telemath", "telelogs",
+                                     "three_gpp", "sixg_bench"],
+                            value=["teleqna", "telemath", "telelogs"],
+                            label="Benchmarks to run"
+                        )
+                    with gr.Row():
+                        bench_tier = gr.Radio(
+                            choices=["lite", "full"], value="lite",
+                            label="Dataset tier (lite = leaderboard default)"
+                        )
+                        bench_limit = gr.Number(
+                            value=25, precision=0,
+                            label="Sample limit per task (0 = all)"
+                        )
+                        bench_conns = gr.Number(
+                            value=8, precision=0, label="Parallel requests"
+                        )
+                        bench_max_tokens = gr.Number(
+                            value=8192, precision=0,
+                            label="Max tokens per answer (0 = uncapped)"
+                        )
+                    bench_run_btn = gr.Button("🚀 Run Benchmark", variant="primary")
+                    bench_status = gr.Markdown("Ready — select benchmarks and press Run.")
+                    bench_table = gr.Dataframe(
+                        headers=["Benchmark", "Samples", "Done", "Accuracy",
+                                 "StdErr", "Status"],
+                        interactive=False, label="Live results"
+                    )
+                    bench_summary = gr.Markdown("")
+                    bench_run_btn.click(
+                        fn=self.run_benchmark,
+                        inputs=[bench_tasks, bench_tier, bench_limit,
+                                bench_conns, bench_max_tokens],
+                        outputs=[bench_status, bench_table, bench_summary]
+                    )
+
             # Event handlers
             def update_system_prompt(selection):
                 return self.system_prompts.get(selection, "")
