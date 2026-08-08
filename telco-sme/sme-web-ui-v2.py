@@ -70,21 +70,43 @@ def _validate_upload_path(path: str) -> str:
     return real
 
 # Configuration
+def _env_bool(name: str, default: bool) -> bool:
+    """Parse a boolean environment variable ('1/true/yes' vs '0/false/no')."""
+    val = os.environ.get(name)
+    if val is None:
+        return default
+    return val.strip().lower() in ("1", "true", "yes", "on")
+
+
 @dataclass
 class Config:
-    """Enhanced configuration for the chat application"""
-    api_endpoint: str = "https://api-url"
-    model_name: str = "model-name"
+    """Enhanced configuration for the chat application.
+
+    Pluggable model endpoint: every connection setting can be supplied via
+    environment variables (no source edits needed per deployment):
+
+        SME_API_ENDPOINT       base URL of an OpenAI-compatible server
+                               (without /v1, e.g. https://my-model.apps.lab)
+        SME_MODEL_NAME         served model name
+        SME_API_TOKEN          bearer token (if the endpoint needs auth)
+        SME_USE_TOKEN_AUTH     true/false (default true)
+        SME_ADMIN_USERNAME     portal login user  (default: admin)
+        SME_ADMIN_PASSWORD     portal login password
+        SME_EMBEDDINGS_ENDPOINT / SME_EMBEDDINGS_MODEL / SME_EMBEDDINGS_TOKEN
+        SME_TLS_VERIFY         true/false (also honored at module level)
+    """
+    api_endpoint: str = os.environ.get("SME_API_ENDPOINT", "https://api-url")
+    model_name: str = os.environ.get("SME_MODEL_NAME", "model-name")
     default_temperature: float = 0.4
     default_max_tokens: int = 20000
-    admin_username: str = "admin"
-    admin_password: str = "minad"
+    admin_username: str = os.environ.get("SME_ADMIN_USERNAME", "admin")
+    admin_password: str = os.environ.get("SME_ADMIN_PASSWORD", "minad")
     max_context_limit: int = 20000
-    verify_ssl: bool = False
-    
+    verify_ssl: bool = _env_bool("SME_TLS_VERIFY", False)
+
     # Token Authentication
-    api_token: str = "your api-key"
-    use_token_auth: bool = True
+    api_token: str = os.environ.get("SME_API_TOKEN", "your api-key")
+    use_token_auth: bool = _env_bool("SME_USE_TOKEN_AUTH", True)
     
     # Timeout settings
     connect_timeout: int = 45
@@ -97,9 +119,9 @@ class Config:
     max_retry_attempts: int = 5
     
     # Embeddings API Configuration
-    embeddings_api_endpoint: str = "https://api-url"
-    embeddings_model_name: str = "model-name"
-    embeddings_api_token: str = "your api-key"
+    embeddings_api_endpoint: str = os.environ.get("SME_EMBEDDINGS_ENDPOINT", "https://api-url")
+    embeddings_model_name: str = os.environ.get("SME_EMBEDDINGS_MODEL", "model-name")
+    embeddings_api_token: str = os.environ.get("SME_EMBEDDINGS_TOKEN", "your api-key")
     
 # Load system prompts from external file
 def load_system_prompts():

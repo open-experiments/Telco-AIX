@@ -147,7 +147,6 @@ System prompts are loaded from `system_prompts.json`, making it easy to customiz
 │   ├── telcos-last-exam/   #   hardest-questions telco exam + per-model answers
 │   ├── model-reports/      #   per-model benchmark answers & perf reports (Qwen3, Seed-36B)
 │   └── embeddings/         #   embeddings benchmark notes
-├── deployments/            # Model deployment assets (Seed-36B scripts, YAML, docs)
 ├── archive/                # Legacy v1 application
 ├── images/                 # Screenshots and documentation images
 └── README.md               # This documentation
@@ -156,7 +155,22 @@ System prompts are loaded from `system_prompts.json`, making it easy to customiz
 ## Configuration
 
 ### API Configuration
-The application is configured to work with vLLM-served models. Update the `Config` class in `sme-web-ui-v2.py`:
+The model endpoint is **pluggable via environment variables** — point the portal
+at any OpenAI-compatible server (vLLM, RHOAI/KServe, TGI, SaaS) without touching
+the source:
+
+```bash
+export SME_API_ENDPOINT="https://my-model-route.apps.mylab"   # base URL, no /v1
+export SME_MODEL_NAME="my-served-model-name"
+export SME_API_TOKEN="..."            # only if the endpoint requires auth
+export SME_USE_TOKEN_AUTH="false"     # default true
+export SME_TLS_VERIFY="false"         # lab clusters with self-signed certs
+python sme-web-ui-v2.py
+```
+
+Embeddings equivalents: `SME_EMBEDDINGS_ENDPOINT`, `SME_EMBEDDINGS_MODEL`,
+`SME_EMBEDDINGS_TOKEN`. Portal login: `SME_ADMIN_USERNAME` / `SME_ADMIN_PASSWORD`.
+Anything not set falls back to the `Config` defaults in `sme-web-ui-v2.py`:
 
 ```python
 class Config:
