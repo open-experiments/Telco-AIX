@@ -1,0 +1,10 @@
+{
+  "environment": "venice.narlabs.io RHOAI 3.5.0-ea.2, 1x RTX PRO 6000 Blackwell 96GB per model, vLLM v0.26.0, temperature 0.0, GSMA ot-lite, inspect-ai 0.3.252",
+  "otel2-llm-31b-it@e120ca76": {"teleqna": 0.795, "teletables": 0.34, "oranbench": 0.7867, "srsranbench": 0.8533, "telemath": 0.58, "telelogs": 0.42, "three_gpp": 0.60, "average": 0.625},
+  "gemma-4-31B-it@842da379": {"teleqna": 0.805, "teletables": 0.35, "oranbench": 0.8267, "srsranbench": 0.82, "telemath": 0.74, "telelogs": 0.53, "three_gpp": 0.47, "average": 0.6488},
+  "experiments": {
+    "otel_teletables_full_500": 0.373,
+    "otel_telemath_thinking_enabled": 0.619,
+    "note": "neither full-dataset nor thinking mode closes the gap to the leaderboard claim (0.9027 avg)"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "model": "otel2-llm-31b-it",
+  "endpoint": "https://otel2-llm-31b-it-gsma-otel2-test.apps.venice.narlabs.io/v1",
+  "tier": "lite",
+  "temperature": 0.0,
+  "max_tokens": 8192,
+  "timestamp": "2026-08-08T02-04-40",
+  "average": 0.6228,
+  "tasks": [
+    {
+      "task": "teleqna",
+      "tier": "lite",
+      "n": 300,
+      "accuracy": 0.7533,
+      "stderr": 0.0249,
+      "request_errors": 0
+    },
+    {
+      "task": "teletables",
+      "tier": "lite",
+      "n": 100,
+      "accuracy": 0.35,
+      "stderr": 0.0477,
+      "request_errors": 0
+    },
+    {
+      "task": "oranbench",
+      "tier": "lite",
+      "n": 150,
+      "accuracy": 0.7933,
+      "stderr": 0.0331,
+      "request_errors": 0
+    },
+    {
+      "task": "srsranbench",
+      "tier": "lite",
+      "n": 150,
+      "accuracy": 0.8533,
+      "stderr": 0.0289,
+      "request_errors": 0
+    },
+    {
+      "task": "telemath",
+      "tier": "lite",
+      "n": 100,
+      "accuracy": 0.57,
+      "stderr": 0.0495,
+      "request_errors": 0
+    },
+    {
+      "task": "telelogs",
+      "tier": "lite",
+      "n": 100,
+      "accuracy": 0.43,
+      "stderr": 0.0495,
+      "request_errors": 0
+    },
+    {
+      "task": "three_gpp",
+      "tier": "lite",
+      "n": 100,
+      "accuracy": 0.61,
+      "stderr": 0.0488,
+      "request_errors": 0
+    }
+  ]
+}

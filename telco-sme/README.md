@@ -141,7 +141,8 @@ System prompts are loaded from `system_prompts.json`, making it easy to customiz
 ├── system_prompts.json     # Expert persona definitions (7+ personas)
 ├── sessions/               # Session storage directory (auto-created)
 ├── requirements-v2.txt     # Python dependencies
-├── benchmarks/            # GenAI benchmark tests for vendors
+├── benchmarks/            # GenAI benchmark tests for vendors (Ericsson/Nokia/Mavenir, preserved)
+├── evals/                 # Self-contained Open-Telco eval framework (embedded datasets, zero external deps)
 ├── models/                # Model-specific configurations
 ├── telcos-last-exam/      # Telco exam questions and comparisons
 ├── images/                # Screenshots and documentation images
@@ -198,6 +199,30 @@ Currently configured for OpenAI-compatible endpoints. The application has been t
 - **List Sessions**: View all active sessions with details
 - **Cleanup**: Remove expired sessions manually
 - **Backup**: Session files stored in `sessions/` directory
+
+## Benchmarking & Evals
+
+Two complementary benchmark assets live in this project:
+
+- **`benchmarks/`** — the original Telco-AIX vendor GenAI test sets
+  (Ericsson / Nokia / Mavenir) with historical results. Preserved as-is.
+- **`evals/`** — a **self-contained Open-Telco eval framework**: the 8 GSMA
+  benchmarks (TeleQnA, TeleTables, TeleMath, TeleLogs, 3GPP-TSG, ORANBench,
+  srsRANBench, 6G-Bench) with both lite and full datasets **embedded in the
+  repo** (gzipped JSONL, ~4.5MB) and a single-file runner (`otel_eval.py`,
+  stdlib + `requests` only). No Hugging Face, no gsma-labs/evals, no
+  inspect-ai required at runtime — evals stay reproducible even if every
+  upstream source disappears. Scoring parity with the official Inspect AI
+  harness is validated to ≤1pp on all 7 leaderboard tasks
+  (see `evals/reference/parity_validation_2026-08-08.md`).
+
+```bash
+cd evals
+python3 otel_eval.py --endpoint https://<model-route>/v1 --model <name>
+```
+
+See `evals/README.md` for full usage, provenance, and the GSMA leaderboard
+verification report that motivated this framework.
 
 ## Development
 
